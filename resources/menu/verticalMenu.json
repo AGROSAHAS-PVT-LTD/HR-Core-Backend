@@ -1,0 +1,357 @@
+{
+  "menu": [
+    {
+      "url": "/superadmin",
+      "name": "Super Admin",
+      "icon": "menu-icon tf-icons bx bx-user",
+      "slug": ["superadmin", "timelineView", "cardView", "taskView"],
+      "role": "superadmin",
+      "is_superadmin": "superadmin"
+    },
+    {
+      "url": "",
+      "name": "Dashboard",
+      "icon": "menu-icon bx bx-home",
+      "slug": "tenant.dashboard"
+    },
+    {
+      "icon": "menu-icon bx bx-bullseye",
+      "name": "Monitoring",
+      "slug": ["liveLocationView", "timelineView", "cardView", "taskView"],
+      "submenu": [
+        {
+          "url": "/liveLocation",
+          "name": "Live Location",
+          "icon": "menu-icon bx bx-map",
+          "slug": "liveLocationView"
+        },
+        {
+          "url": "/timeline",
+          "name": "Time Line",
+          "icon": "menu-icon fa fa-route",
+          "slug": "timelineView"
+        },
+        {
+          "url": "/cardView",
+          "name": "Card View",
+          "icon": "menu-icon bx bx-card",
+          "slug": "cardView"
+        },
+        {
+          "url": "/taskView",
+          "name": "Task View",
+          "icon": "menu-icon bx bx-task",
+          "slug": "taskView",
+          "addon": "TaskSystem"
+        }
+      ]
+    },
+    {
+      "url": "/employees",
+      "name": "Employees",
+      "icon": "menu-icon bx bx-group",
+      "slug": "employees.index"
+    },
+    {
+      "url": "/attendance",
+      "name": "Attendance",
+      "icon": "menu-icon bx bx-time-five",
+      "slug": "attendance.index"
+    },
+    {
+      "url": "/payroll",
+      "name": "Payroll",
+      "icon": "menu-icon bx bx-money",
+      "slug": "payroll.index",
+      "addon": "Payroll"
+    },
+    {
+      "url": "/device",
+      "name": "Devices",
+      "icon": "menu-icon bx bx-devices",
+      "slug": "device.index"
+    },
+    {
+      "url": "/dynamicqrattendance",
+      "name": "QR Devices",
+      "icon": "menu-icon bx bx-devices",
+      "slug": "dynamicqrattendance.index",
+      "addon": "DynamicQrAttendance"
+    },
+    {
+      "url": "/paymentcollection",
+      "name": "Payment Collections",
+      "icon": "menu-icon bx bx-money",
+      "slug": "paymentcollection.index",
+      "addon": "PaymentCollection"
+    },
+    {
+      "name": " Clients & Visits",
+      "icon": "menu-icon bx bx-user",
+      "slug": ["client.index", "visits.index"],
+      "submenu": [
+        {
+          "url": "/clients",
+          "name": "Clients",
+          "icon": "menu-icon bx bx-user",
+          "slug": "client.index"
+        },
+        {
+          "url": "/visits",
+          "name": "Visits",
+          "icon": "menu-icon bx bx-show",
+          "standardAddon": "ClientVisit",
+          "slug": "visits.index"
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "icon": "menu-icon bx bx-file-blank",
+      "slug": ["leaveRequests.index", "expenseRequests.index", "documentmanagement.index", "loan.index"],
+      "submenu": [
+        {
+          "url": "/leaveRequests",
+          "name": "Leave Requests",
+          "icon": "menu-icon bx bx-file-blank",
+          "slug": "leaveRequests.index",
+          "standardAddon": "LeaveManagement"
+        },
+        {
+          "url": "/expenseRequests",
+          "name": "Expense Requests",
+          "icon": "menu-icon bx bx-file-blank",
+          "slug": "expenseRequests.index",
+          "standardAddon": "ExpenseManagement"
+        },
+        {
+          "url": "/documentmanagement",
+          "name": "Document Requests",
+          "icon": "menu-icon bx bx-file-blank",
+          "slug": "documentmanagement.index",
+          "addon": "DocumentManagement"
+        },
+        {
+          "url": "/loan",
+          "name": "Loan Requests",
+          "icon": "menu-icon bx bx-file-blank",
+          "slug": "loan.index",
+          "addon": "LoanManagement"
+        }
+      ]
+    },
+    {
+      "name": "Task Management",
+      "icon": "menu-icon bx bx-task",
+      "slug": "task.index",
+      "url": "/task",
+      "addon": "TaskSystem"
+    },
+    {
+      "icon": "menu-icon bx bx-package",
+      "name": "Products & Orders",
+      "addon": "ProductOrder",
+      "slug": ["order.index", "product.index", "productcategory.index"],
+      "submenu": [
+        {
+          "url": "/order",
+          "name": "Orders",
+          "icon": "menu-icon bx bx-cart",
+          "slug": "order.index"
+        },
+        {
+          "url": "/product",
+          "name": "Product",
+          "icon": "menu-icon bx bx-box",
+          "slug": "product.index"
+        },
+        {
+          "url": "/productcategory",
+          "name": "Product Categories",
+          "icon": "menu-icon bx bx-category",
+          "slug": "productcategory.index"
+        }
+      ]
+    },
+    {
+      "name": "Custom Forms",
+      "icon": "menu-icon bx bx-file",
+      "addon": "DynamicForms",
+      "slug": ["forms.index", "formSubmissions.index", "formAssignments.index"],
+      "submenu": [
+        {
+          "url": "/forms",
+          "name": "Forms",
+          "icon": "menu-icon bx bx-file",
+          "slug": "forms.index"
+        },
+        {
+          "url": "/formSubmissions",
+          "name": "Form Submissions",
+          "icon": "menu-icon bx bx-file",
+          "slug": "formSubmissions.index"
+        },
+        {
+          "url": "/formAssignments",
+          "name": "Form Assignments",
+          "icon": "menu-icon bx bx-file",
+          "slug": "formAssignments.index"
+        }
+      ]
+    },
+    {
+      "icon": "menu-icon bx bx-data",
+      "name": "Masters",
+      "slug": [
+        "shifts.index",
+        "holidays.index",
+        "ipgroup.index",
+        "geofencegroup.index",
+        "qrcode.index",
+        "leaveTypes.index",
+        "expenseTypes.index",
+        "documenttypes.index",
+        "siteattendance.index",
+        "teams.index",
+        "departments.index",
+        "designations.index"
+      ],
+      "submenu": [
+        {
+          "url": "/shifts",
+          "name": "Shifts",
+          "icon": "menu-icon bx bx-time-five",
+          "slug": "shifts.index"
+        },
+        {
+          "url": "/holidays",
+          "name": "Holidays",
+          "icon": "menu-icon bx bx-calendar-alt",
+          "slug": "holidays.index"
+        },
+        {
+          "url": "/ipgroup",
+          "name": "IP Groups",
+          "icon": "menu-icon bx bx-network-chart",
+          "slug": "ipgroup.index",
+          "addon": "IpAddressAttendance"
+        },
+        {
+          "url": "/geofencegroup",
+          "name": "Geofence Groups",
+          "icon": "menu-icon bx bx-map",
+          "slug": "geofencegroup.index",
+          "addon": "GeofenceAttendance"
+        },
+        {
+          "url": "/qrcode",
+          "name": "QR Code Groups",
+          "icon": "menu-icon bx bx-qr",
+          "slug": "qrcode.index",
+          "addon": "QrAttendance"
+        },
+        {
+          "url": "siteattendance",
+          "name": "Sites",
+          "icon": "menu-icon bx bx-map",
+          "slug": "siteattendance.index",
+          "addon": "SiteAttendance"
+        },
+        {
+          "url": "/leaveTypes",
+          "name": "Leave Types",
+          "icon": "menu-icon bx bx-calendar-check",
+          "slug": "leaveTypes.index",
+          "standardAddon": "LeaveManagement"
+        },
+        {
+          "url": "/expenseTypes",
+          "name": "Expense Types",
+          "icon": "menu-icon bx bx-money",
+          "slug": "expenseTypes.index",
+          "standardAddon": "ExpenseManagement"
+        },
+        {
+          "url": "/documenttypes",
+          "name": "Document Types",
+          "icon": "menu-icon bx bx-file",
+          "slug": "documenttypes.index",
+          "addon": "DocumentManagement"
+        },
+        {
+          "url": "/teams",
+          "name": "Teams",
+          "icon": "menu-icon bx bx-group",
+          "slug": "teams.index"
+        },
+        {
+          "url": "/departments",
+          "name": "Departments",
+          "icon": "menu-icon tf-icons bx bx-building",
+          "slug": "departments.index"
+        },
+        {
+          "url": "/designations",
+          "name": "Designations",
+          "icon": "menu-icon tf-icons bx bx-briefcase",
+          "slug": "designations.index"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Utilities"
+    },
+    {
+      "url": "/aiChat",
+      "name": "AI Chat",
+      "icon": "menu-icon bx bx-chat",
+      "slug": "aiChat.index",
+      "addon": "AiChat",
+      "badge": ["danger", "Beta"]
+    },
+    {
+      "url": "/noticeboard",
+      "name": "Noticeboard",
+      "icon": "menu-icon bx bx-note",
+      "slug": "noticeboard.index",
+      "addon": "NoticeBoard"
+    },
+    {
+      "name": "Organization Hierarchy",
+      "icon": "menu-icon bx bx-sitemap",
+      "slug": "organizationHierarchy.index",
+      "url": "/organizationHierarchy"
+    },
+    {
+      "url": "/dataImportExport",
+      "name": "Data Import/Export",
+      "icon": "menu-icon bx bx-import",
+      "slug": "dataImportExport.index",
+      "addon": "DataImportExport"
+    },
+    {
+      "url": "/notifications",
+      "name": "Notifications",
+      "icon": "menu-icon bx bx-bell",
+      "slug": "notifications.index"
+    },
+    {
+      "url": "/reports",
+      "name": "Reports",
+      "icon": "menu-icon bx bx-file",
+      "slug": "reports.index"
+    },
+    {
+      "url": "/auditLogs",
+      "icon": "menu-icon tf-icons bx bx-history",
+      "name": "Audit Logs",
+      "slug": "auditLogs.index"
+    },
+    {
+      "url": "roles",
+      "icon": "menu-icon tf-icons bx bx-user",
+      "name": "Roles",
+      "slug": "roles.index"
+    }
+  ]
+}

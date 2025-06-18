@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/paymentcollection",
+    "description": "",
+    "authors": [
+        {
+            "name": "CZ App Studio",
+            "email": "support@czappstudio.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PaymentCollection\\": "",
+            "Modules\\PaymentCollection\\App\\": "app/",
+            "Modules\\PaymentCollection\\Database\\Factories\\": "database/factories/",
+            "Modules\\PaymentCollection\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PaymentCollection\\Tests\\": "tests/"
+        }
+    }
+}

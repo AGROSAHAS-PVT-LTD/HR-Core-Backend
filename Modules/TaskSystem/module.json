@@ -1,0 +1,13 @@
+{
+  "name": "TaskSystem",
+  "alias": "tasksystem",
+  "displayName": "Task System",
+  "version": "2.0.0",
+  "description": "This module will allow you to create, manage tasks for employees.",
+  "keywords": [],
+  "priority": 0,
+  "providers": [
+    "Modules\\TaskSystem\\App\\Providers\\TaskSystemServiceProvider"
+  ],
+  "files": []
+}

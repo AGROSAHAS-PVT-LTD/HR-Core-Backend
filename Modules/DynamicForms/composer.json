@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/dynamicforms",
+    "description": "",
+    "authors": [
+        {
+            "name": "CZ App Studio",
+            "email": "support@czappstudio.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\DynamicForms\\": "",
+            "Modules\\DynamicForms\\App\\": "app/",
+            "Modules\\DynamicForms\\Database\\Factories\\": "database/factories/",
+            "Modules\\DynamicForms\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\DynamicForms\\Tests\\": "tests/"
+        }
+    }
+}

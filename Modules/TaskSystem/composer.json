@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/tasksystem",
+    "description": "",
+    "authors": [
+        {
+            "name": "CZ App Studio",
+            "email": "support@czappstudio.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\TaskSystem\\": "",
+            "Modules\\TaskSystem\\App\\": "app/",
+            "Modules\\TaskSystem\\Database\\Factories\\": "database/factories/",
+            "Modules\\TaskSystem\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\TaskSystem\\Tests\\": "tests/"
+        }
+    }
+}

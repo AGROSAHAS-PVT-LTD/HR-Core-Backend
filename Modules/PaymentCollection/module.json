@@ -1,0 +1,13 @@
+{
+    "name": "PaymentCollection",
+    "alias": "paymentcollection",
+    "displayName" : "Payment Collection",
+    "version": "2.0.0",
+    "description": "This module is used to manage payment collection entries.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PaymentCollection\\App\\Providers\\PaymentCollectionServiceProvider"
+    ],
+    "files": []
+}

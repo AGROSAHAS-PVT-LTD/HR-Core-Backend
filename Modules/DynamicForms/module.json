@@ -1,0 +1,13 @@
+{
+  "name": "DynamicForms",
+  "alias": "dynamicforms",
+  "displayName": "Custom Forms",
+  "version": "2.0.0",
+  "description": "This module allows you to create custom forms.",
+  "keywords": [],
+  "priority": 0,
+  "providers": [
+    "Modules\\DynamicForms\\App\\Providers\\DynamicFormsServiceProvider"
+  ],
+  "files": []
+}
