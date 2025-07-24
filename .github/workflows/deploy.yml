@@ -103,16 +103,3 @@ jobs:
           
          
 
-    - name: 🔒 Verify Deployment
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /var/www/gps-openhr-laravel
-          php artisan --version
-          php -v
-          node -v
-          yarn -v
-          curl -I http://localhost || true

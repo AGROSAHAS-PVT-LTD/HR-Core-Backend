@@ -40,7 +40,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="mb-0"><i class="fas fa-store-alt me-2"></i>{{ $title }}</h5>
         <div class="d-flex">
-            @if (!$currentSubscription->isInTrialPeriod())
+            @if ($currentSubscription && !$currentSubscription->isInTrialPeriod())
                 @if(!$business->is_active || !$currentSubscription || !$currentSubscription->isActive())
                     <button class="btn btn-sm btn-outline-warning me-2" data-bs-toggle="tooltip" title="Business Status">
                         <i class="fas fa-exclamation-circle me-1"></i> Attention Needed
@@ -52,7 +52,7 @@
             
         </div>
     </div>
-    @if (!$currentSubscription->isInTrialPeriod())
+    @if ($currentSubscription && !$currentSubscription->isInTrialPeriod())
     <!-- Alert Section -->
     @if(!$business->is_active || !$currentSubscription || !$currentSubscription->isActive())
         <div class="alert alert-warning alert-dismissible fade show shadow-sm">
@@ -239,6 +239,7 @@
                             <th width="120">Actions</th>
                             <th>Package</th>
                             <th>Period</th>
+                            <th>Price</th>
                             <th>Payment</th>
                             <th>Status</th>
                             <th>Created</th>
@@ -249,7 +250,7 @@
                             <tr>
                                 <td>
                                     @if($subscription->status !== 'approved')
-                                        <button class="btn btn-sm btn-outline-primary" onclick="openPaymentModal({{ $subscription->id }})">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="openPaymentModal({{ $subscription->id }},{{ $subscription->package_price }},{{ $subscription->package_id }},'{{ $subscription->package->name }}')">
                                             <i class="fas fa-credit-card me-1"></i> Pay
                                         </button>
                                     @else
@@ -264,6 +265,12 @@
                                     <div class="d-flex flex-column">
                                         <small class="text-muted">Start: {{ $subscription->start_date }}</small>
                                         <small class="text-muted">End: {{ $subscription->end_date }}</small>
+                                    </div>
+                                </td>   
+                                <td>
+                                    <div>
+
+                                        <span class="d-block">UGX {{ $subscription->formatted_package_price }}</span>
                                     </div>
                                 </td>
                                 <td>
@@ -303,6 +310,9 @@
                 <form id="paymentForm" method="POST" action="{{ route('update.subscription') }}">
                     @csrf
                     <input type="hidden" id="subscriptionId" name="subscription_id">
+                    <input type="hidden" id="package_price" name="package_price">
+                    <input type="hidden" id="package_id" name="package_id">
+                    <input type="hidden" id="package_name" name="package_name">
                     
                     <div class="mb-4">
                         <label class="form-label">Select Payment Method</label>
@@ -395,10 +405,13 @@
 @section('scripts')
 <script src="https://checkout.flutterwave.com/v3.js"></script>
 <script>
-    function openPaymentModal(subscriptionId) {
+    function openPaymentModal(subscriptionId, packagePrice, packageId, packageName) {
         const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
         document.getElementById('subscriptionId').value = subscriptionId;
-        
+        document.getElementById('package_price').value = packagePrice;
+        document.getElementById('package_id').value = packageId;
+        document.getElementById('package_name').value = packageName;
+
         // Reset all payment sections
         document.querySelectorAll('.payment-section').forEach(el => {
             el.classList.add('d-none');
@@ -423,10 +436,13 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
         
+        const subscriptionId = document.getElementById('subscriptionId').value;
+        const packagePrice = document.getElementById('package_price').value;
+        
         FlutterwaveCheckout({
             public_key: "{{ $settings->flutterwave_public_key }}",
-            tx_ref: 'FLW-'+Math.random().toString(36).substring(2, 15),
-            amount: {{ $currentSubscription->package->price ?? 0 }},
+            tx_ref: `FLW-${"{{ $business->id }}"}-${subscriptionId}-${Date.now()}`,
+            amount: packagePrice,
             currency: "{{ $settings->currency }}",
             payment_options: "card, mobilemoneyuganda, ussd",
             redirect_url: "{{ route('home.postFlutterwavePaymentCallback') }}",
@@ -435,9 +451,16 @@
                 phone_number: "{{ $business->owner->phone_number }}",
                 name: "{{ $business->owner->first_name }} {{ $business->owner->last_name }}",
             },
+            meta: {
+                business_id: "{{ $business->id }}",
+                package_id: document.getElementById('package_id').value,
+                subscription_id: subscriptionId,
+                gateway: "flutterwave",
+                user_id: "{{ $business->owner->id }}"
+            },
             customizations: {
                 title: "{{ $business->name }} Subscription",
-                description: "Payment for {{ $currentSubscription->package->name ?? '' }}",
+                description: "Payment for " + document.getElementById('package_name').value,
                 logo: "{{ asset('images/logo.png') }}",
             },
             callback: function(response) {
@@ -453,5 +476,3 @@
     }
 </script>
 @endsection
-
-
