@@ -89,13 +89,8 @@ jobs:
           composer install --no-dev --optimize-autoloader
           yarn install --production
           cp .env.example .env || true
-          php artisan migrate --force
           php artisan storage:link
-          php artisan optimize:clear
-          php artisan optimize
-          php artisan view:cache
-          php artisan route:cache
-          php artisan config:cache
+         
 
     - name: 🔒 Verify Deployment
       uses: appleboy/ssh-action@v0.1.6
