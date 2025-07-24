@@ -86,10 +86,25 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/gps-openhr-laravel
-          composer install --no-dev --optimize-autoloader
-          yarn install --production
+          # Install Yarn if missing
+          if ! command -v yarn &> /dev/null; then
+            npm install -g yarn
+          fi
+          # Install composer dependencies with PHP version check
+          if php -v | grep -q '8.1\|8.2'; then
+            composer install --no-dev --optimize-autoloader
+          else
+            echo "Warning: PHP version not compatible with some packages"
+            composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+          fi
+          # Install node dependencies
+          yarn install --production || npm install --production
           cp .env.example .env || true
           php artisan storage:link
+          php artisan optimize:clear
+          php artisan view:cache
+          php artisan route:cache
+          php artisan config:cache
          
 
     - name: 🔒 Verify Deployment
