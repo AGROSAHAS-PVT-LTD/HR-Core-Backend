@@ -34,6 +34,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-composer-
 
+    - name: 🏗️ Prepare Directories
+      run: |
+        mkdir -p bootstrap/cache
+        mkdir -p storage/framework/{cache,sessions,testing,views}
+        mkdir -p storage/logs
+
     - name: 🧩 Install Composer Dependencies
       run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
 
