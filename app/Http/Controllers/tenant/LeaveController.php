@@ -20,7 +20,8 @@ class LeaveController extends Controller
 {
   public function index()
   {
-    $employees = User::all();
+    // $employees = User::all();
+    $employees = User::where('business_id', auth()->user()->business_id)->get();
     $leaveTypes = LeaveType::all();
     return view('tenant.leave.index', compact('employees'), compact('leaveTypes'));
   }

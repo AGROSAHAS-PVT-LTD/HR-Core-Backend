@@ -19,7 +19,7 @@ class ExpenseController extends Controller
 {
   public function index()
   {
-    $employees = User::all();
+    $employees = User::where('business_id', auth()->user()->business_id)->get();
     $expenseTypes = ExpenseType::all();
     return view('tenant.expenses.index', compact('employees'), compact('expenseTypes'));
   }

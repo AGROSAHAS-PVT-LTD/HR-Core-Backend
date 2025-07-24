@@ -8,7 +8,7 @@ class AuditLogController extends Controller
 {
   public function index()
   {
-    $auditLogs = Audit::with('user')->get();
+    $auditLogs = Audit::where('business_id', auth()->user()->business_id)->with('user')->get();
     return view('audit-logs.index', compact('auditLogs'));
   }
 

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Subscription extends Model
 {
@@ -61,13 +63,7 @@ class Subscription extends Model
         return $this->status === 'approved' && $this->end_date && \Carbon\Carbon::now()->lessThanOrEqualTo($this->end_date);
     }
 
-    // Check if the subscription is in the trial period
-    public function isInTrialPeriod()
-    {
-        $trialEndDate = $this->trial_end_date ? \Carbon\Carbon::parse($this->trial_end_date) : null;
-        return $trialEndDate && \Carbon\Carbon::now()->lessThanOrEqualTo($trialEndDate);
-    }
-
+   
     // Format the package price
     // public function getFormattedPackagePriceAttribute()
     // {
@@ -86,16 +82,57 @@ class Subscription extends Model
         return $this->package_price ? number_format($this->package_price, 0) : 'N/A';
     }
 
+    // Check if the subscription is in the trial period
+    public function isInTrialPeriod()
+    {
+        $trialEndDate = $this->trial_end_date ? \Carbon\Carbon::parse($this->trial_end_date) : null;
+        return $trialEndDate && \Carbon\Carbon::now()->lessThanOrEqualTo($trialEndDate);
+    }
+   
+
     // Accessor for remaining days
     public function getRemainingDaysAttribute()
     {
-        if ($this->end_date) {
+        if(!$this->isInTrialPeriod() && !$this->isActive() ){
+            return 0;
+        }
+
+        if ($this->isInTrialPeriod() && $this->trial_end_date) {
+            $remainingDays = now()->diffInDays($this->trial_end_date, false);
+            return max(0, (int) $remainingDays); // Ensures it's an integer and not negative
+        }else{
             $remainingDays = now()->diffInDays($this->end_date, false);
             return max(0, (int) $remainingDays); // Ensures it's an integer and not negative
         }
 
         return 0; // Return 0 instead of 'N/A' for consistency
     }
+
+
+     public function getSubscriptionDaysAttribute()
+     {
+        //  if(!$this->isInTrialPeriod() || !$this->isActive() ){
+        //     return 0;
+        //  }
+
+         $start = $this->start_date ? Carbon::parse($this->start_date) : null;
+     
+         if (!$start) {
+             return 0;
+         }
+     
+         if ($this->isInTrialPeriod() && $this->trial_end_date) {
+             $end = Carbon::parse($this->trial_end_date);
+         } elseif ($this->end_date) {
+             $end = Carbon::parse($this->end_date);
+         } else {
+             return 0;
+         }
+     
+         $days = $start->diffInDays($end, false);
+         return max(0, (int) $days);
+     }
+
 
 
     // Check if the subscription is in trial period

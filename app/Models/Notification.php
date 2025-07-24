@@ -18,7 +18,12 @@ class Notification extends Model
     'notifiable_type',
     'data',
     'read_at',
+  'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   public function getTypeString(): string
   {

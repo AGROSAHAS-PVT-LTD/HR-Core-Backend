@@ -26,8 +26,12 @@
                   class="app-brand-logo demo">
                   <img src="{{asset('assets/img/logo.png')}}" alt="Logo" width="27">
                 </span>
+
                 <span
-                  class="app-brand-text demo menu-text fw-bold text-heading">{{config('variables.templateName')}}</span>
+                  class="app-brand-text demo menu-text fw-bold text-heading">
+                    {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}
+
+              </span>
               </a>
 
               @if(isset($menuHorizontal))
@@ -77,7 +81,7 @@
                 <!-- /Search -->
               @endif
 
-              @if(auth()->user()->roles()->first()->name != 'super_admin')
+              @if(auth()->user()->is_superuser)
                 @if($addonService->isAddonEnabled(ModuleConstants::SOS,true))
                   <!-- SOS Requests -->
                   <li class="nav-item dropdown dropdown-sos me-2 me-xl-0">
@@ -104,7 +108,7 @@
                 @endif
               @endif
 
-              @if($configData['displayQuickCreate'] == true&& auth()->user()->roles()->first()->name != 'super_admin')
+              @if($configData['displayQuickCreate'] == true&& auth()->user()->is_superuser)
                 @include('layouts.sections.menu.quickCreateMenu')
               @endif
               @if($configData['displayAddon'] == true)
@@ -117,14 +121,17 @@
                   </a>
                 </li>
               @endif
-              <!-- Settings -->
-              <li class="nav-item dropdown dropdown-addons me-2 me-xl-0">
-                <a class="nav-link dropdown-toggle hide-arrow" href="{{route('settings.index')}}">
-                  <i data-bs-toggle="tooltip"
-                     data-bs-placement="top"
-                     title="@lang('Settings')" class="tf-icons bx bx-cog"></i>
-                </a>
-              </li>
+
+              @if(auth()->user()->is_superuser)
+                <!-- Settings -->
+                <li class="nav-item dropdown dropdown-addons me-2 me-xl-0">
+                  <a class="nav-link dropdown-toggle hide-arrow" href="{{route('settings.index')}}">
+                    <i data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="@lang('Settings')" class="tf-icons bx bx-cog"></i>
+                  </a>
+                </li>
+              @endif
               <!-- Language -->
               @if($configData['displayLanguage'] == true)
                 <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
@@ -281,7 +288,7 @@
               <!-- Quick links -->
 
               <!-- Notification -->
-              @if($configData['displayNotification'] == true && auth()->user()->roles()->first()->name != 'super_admin')
+              @if($configData['displayNotification'] == true)
                 @include('layouts.sections.navbar.notifications')
               @endif
               <!--/ Notification -->

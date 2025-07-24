@@ -35,8 +35,8 @@ class DashboardController extends Controller
 {
   public function index()
   {
-    $totalUser = User::count();
-    $active = User::where('status', UserAccountStatus::ACTIVE)->count();
+    $totalUser = User::where('business_id', auth()->user()->business_id)->count();
+    $active = User::where('status', UserAccountStatus::ACTIVE)->where('business_id', auth()->user()->business_id)->count();
     $presentUsersCount = Attendance::whereDate('created_at', now())->count();
     $presentUsersCountLastWeek = Attendance::whereBetween('created_at', [now()->startOfWeek()->subWeek(), now()->endOfWeek()->subWeek()])
       ->where('check_out_time', '!=', null)
@@ -241,6 +241,7 @@ class DashboardController extends Controller
     $users = User::where('status', '=', 'active')
       ->where('team_id', '!=', null)
       ->where('shift_id', '!=', null)
+      ->where('business_id', auth()->user()->business_id)
       ->get();
 
     $userDevices = UserDevice::whereIn('user_id', $users->pluck('id'))
@@ -334,6 +335,7 @@ class DashboardController extends Controller
     $users = User::where('status', '=', 'active')
       ->where('team_id', '!=', null)
       ->where('shift_id', '!=', null)
+      ->where('business_id', auth()->user()->business_id)
       ->get();
 
     $userDevices = UserDevice::whereIn('user_id', $users->pluck('id'))
@@ -389,7 +391,7 @@ class DashboardController extends Controller
 
   public function timelineView()
   {
-    $employees = User::where('status', UserAccountStatus::ACTIVE)
+    $employees = User::where('status', UserAccountStatus::ACTIVE)->where('business_id', auth()->user()->business_id)
       ->get();
 
     return view('tenant.dashboard.timeline_view', [

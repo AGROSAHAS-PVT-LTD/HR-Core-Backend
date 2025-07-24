@@ -23,7 +23,8 @@
                 <span
                   class="app-brand-logo demo">@include('_partials.macros',["width"=>25,"withbg"=>'var(--bs-primary)'])</span>
                 <span
-                  class="app-brand-text demo menu-text fw-bold text-heading">{{config('variables.templateName')}}</span>
+                  class="app-brand-text demo menu-text fw-bold text-heading">
+                  {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}</span>
               </a>
 
               @if(isset($menuHorizontal))

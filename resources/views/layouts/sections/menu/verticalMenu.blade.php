@@ -16,7 +16,9 @@
           class="app-brand-logo demo">
            <img src="{{asset('assets/img/logo.png')}}" alt="Logo" width="27">
         </span>
-        <span class="app-brand-text demo menu-text fw-bold ms-2">{{config('variables.templateName')}}</span>
+        <span class="app-brand-text demo menu-text fw-bold ms-2">
+          {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}
+      </span>
       </a>
 
       <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

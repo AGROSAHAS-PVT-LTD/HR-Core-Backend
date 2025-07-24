@@ -26,8 +26,13 @@ class GeofenceVerificationLog extends Model implements AuditableContract
     'geofence_group_id',
     'created_by_id',
     'updated_by_id',
-    'tenant_id'
+    'tenant_id',
+  'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
   protected $casts = [
     'is_verified' => 'boolean',
     'verified_at' => 'datetime',

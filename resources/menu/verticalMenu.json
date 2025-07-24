@@ -302,6 +302,12 @@
       "menuHeader": "Utilities"
     },
     {
+      "url": "/check_subcription",
+      "name": "Subscription",
+      "icon": "menu-icon bx bx-time-five",
+      "slug": "check.subcription"
+    },
+    {
       "url": "/aiChat",
       "name": "AI Chat",
       "icon": "menu-icon bx bx-chat",

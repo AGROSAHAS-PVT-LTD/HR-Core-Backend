@@ -43,7 +43,7 @@ class TaskSystemController extends Controller
    */
   public function create()
   {
-    $employees = User::where('shift_id', '!=', null)->get();
+    $employees = User::where('business_id', auth()->user()->business_id)->where('shift_id', '!=', null)->get();
 
     $clients = Client::all();
 

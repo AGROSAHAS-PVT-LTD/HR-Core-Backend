@@ -22,7 +22,13 @@ class IpAddressVerificationLog extends Model implements AuditableContract
     'ip_address_group_id',
     'created_at',
     'updated_at',
+ 'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
+  
   protected $casts = [
     'is_verified' => 'boolean',
   ];

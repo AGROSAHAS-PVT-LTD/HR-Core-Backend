@@ -23,7 +23,9 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
             class="app-brand-logo demo">
             <img src="{{asset('assets/img/logo.png')}}" alt="Logo" width="27">
           </span>
-          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1">{{config('variables.templateName')}}</span>
+          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1">          
+            {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}
+          </span>
         </a>
       </div>
       <!-- Menu logo wrapper: End -->

@@ -99,8 +99,6 @@ class ShiftController extends Controller
     }
   }
 
-
-
   public function addOrUpdateShiftAjax(Request $request)
   {
     $shiftId = $request->id;

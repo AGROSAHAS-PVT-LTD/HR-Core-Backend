@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\TenantTrait;
+use App\Traits\TenantAware;
 use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +11,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Designation extends Model implements AuditableContract
 {
-  use Auditable, UserActionsTrait, TenantTrait, SoftDeletes;
+  use Auditable, UserActionsTrait, TenantAware, SoftDeletes;
 
   protected $table = 'designations';
 
@@ -23,6 +23,7 @@ class Designation extends Model implements AuditableContract
     'department_id',
     'parent_id',
     'tenant_id',
+    'business_id',
     'level',
     'is_leave_approver',
     'is_expense_approver',
@@ -83,6 +84,11 @@ class Designation extends Model implements AuditableContract
   public function users()
   {
     return $this->hasMany(User::class, 'designation_id');
+  }
+
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
   }
 
 }

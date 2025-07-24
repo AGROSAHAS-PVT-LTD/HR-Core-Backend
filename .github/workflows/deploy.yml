@@ -1,0 +1,110 @@
+name: Deploy Laravel Application to Production Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  APP_ENV: production
+  APP_DEBUG: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🏗️ Setup PHP with extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, zip, curl, mysql
+        tools: composer:v2
+        coverage: none
+
+    - name: 🗄️ Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: 🧩 Install Composer Dependencies
+      run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+
+    - name: 🧱 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: 📦 Install NPM Dependencies
+      run: |
+        npm ci
+        npx update-browserslist-db@latest
+        npm install vue-loader@latest
+
+    - name: 🏗️ Build Assets (if needed)
+      run: npm run build
+
+    - name: 🔍 Run Tests
+      run: |
+        php artisan test
+        npm run test
+
+    - name: 🚀 Synchronize Files to Server
+      uses: easingthemes/ssh-deploy@v2.1.5
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      with:
+        REMOTE_HOST: ${{ secrets.SSH_HOST }}
+        REMOTE_USER: ${{ secrets.SSH_USER }}
+        SOURCE: "."
+        TARGET: "/var/www/gps-openhr-laravel"
+        ARGS: >
+          -rltgoDzvO --delete
+          --exclude .env
+          --exclude node_modules
+          --exclude vendor
+          --exclude .git
+          --exclude .github
+          --exclude storage
+          --exclude bootstrap/cache
+
+    - name: ⚙️ Run Remote Laravel Artisan Commands
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/gps-openhr-laravel
+          composer install --no-dev --optimize-autoloader
+          npm install --production
+          cp .env.example .env || true
+          php artisan migrate --force
+          php artisan storage:link
+          php artisan optimize:clear
+          php artisan optimize
+          php artisan view:cache
+          php artisan route:cache
+          php artisan config:cache
+
+    - name: 🔒 Verify Deployment
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/gps-openhr-laravel
+          php artisan --version
+          php -v
+          node -v
+          npm -v
+          curl -I http://localhost || true

@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\SuperAdminMiddleware;
+use App\Http\Middleware\CheckSubscription;
+
+
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuditLogController;
@@ -60,7 +63,7 @@ Route::middleware([
   Route::post('/auth/login', [AuthController::class, 'loginPost'])->name('auth.loginPost');
   Route::get('/accessDenied', [BaseController::class, 'accessDenied'])->name('accessDenied');
 
-  Route::middleware('auth')->group(callback: function () {
+  Route::middleware(['auth', CheckSubscription::class])->group(callback: function () {
 
     Route::group(['middleware' => function ($request, $next) {
       $addonService = app(IAddonService::class);
@@ -421,6 +424,10 @@ Route::middleware([
     Route::get('/superadmin/communicator', [SuperAdminController::class, 'superAdminCommunicator'])->middleware(SuperAdminMiddleware::class)->name('superadmin.communicator');
     Route::post('/superadmin/communicator/store', [SuperAdminController::class, 'sendMessage'])->middleware(SuperAdminMiddleware::class)->name('superadmin.communicator.store');
     Route::post('/superadmin/updatePaymentSettings', [SuperAdminController::class, 'updatePaymentSettings'])->middleware(SuperAdminMiddleware::class)->name('superadmin.pay.settings');
-   
+    
+    Route::get('/check_subcription', [SuperAdminController::class, 'checkSubcription'])->name('check.subcription');
+    Route::post('/update-subscription', [SuperAdminController::class, 'updateSubscription'])->name('update.subscription');
+
+
 
 });

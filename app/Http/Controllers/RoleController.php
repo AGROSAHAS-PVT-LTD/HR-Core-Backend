@@ -10,12 +10,32 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-  public function index()
+  public function indexOld()
   {
-    $roles = Role::with('users')->get();
+    $roles = Role::where('business_id', auth()->user()->business_id)
+                   ->with('users')->get();
 
     return view('roles.index', compact('roles'));
   }
+  
+  
+  public function index()
+  {
+      $businessId = auth()->user()->business_id;
+
+      $roles = Role::where(function($query) use ($businessId) {
+              $query->whereNull('business_id')
+                    ->orWhere('business_id', $businessId);
+          })
+          ->with(['users' => function ($query) use ($businessId) {
+              $query->where('business_id', $businessId);
+          }])
+          ->get();
+
+      return view('roles.index', compact('roles'));
+  }
+
+
 
   public function addOrUpdateAjax(Request $request)
   {
@@ -36,6 +56,7 @@ class RoleController extends Controller
     // Prepare role data
     $roleData = [
       'name' => $request->name,
+      'business_id' => auth()->user()->business_id,
       'is_multiple_check_in_enabled' => $request->has('isMultiCheckInEnabled') && $request->isMultiCheckInEnabled == 'on',
       'is_mobile_app_access_enabled' => $request->has('mobileAppAccess') && $request->mobileAppAccess == 'on',
       'is_web_access_enabled' => $request->has('webAppAccess') && $request->webAppAccess == 'on',
@@ -65,7 +86,13 @@ class RoleController extends Controller
       return Error::response('This feature is disabled in demo mode');
     }
 
-    $role = Role::find($id);
+    // $role = Role::find($id);
+    $businessId = auth()->user()->business_id;
+
+    // Properly filter by ID and business_id
+    $role = Role::where('id', $id)
+                ->where('business_id', $businessId)
+                ->first();
 
     if (!$role) {
       return Error::response('Role not found');

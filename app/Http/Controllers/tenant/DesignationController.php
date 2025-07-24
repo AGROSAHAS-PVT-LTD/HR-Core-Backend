@@ -11,6 +11,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+
 
 class DesignationController extends Controller
 {
@@ -28,7 +30,7 @@ class DesignationController extends Controller
     return view('tenant.designation.index');
   }
 
-  public function indexAjax(Request $request)
+  public function indexAjaxOld(Request $request)
   {
     try {
       $columns = [
@@ -109,6 +111,105 @@ class DesignationController extends Controller
       return Error::response('Something went wrong');
     }
   }
+
+  public function indexAjax(Request $request)
+  {
+      try {
+          $columns = [
+              1 => 'id',
+              2 => 'name',
+              3 => 'code',
+              4 => 'departmentId',
+              5 => 'notes',
+              6 => 'status',
+          ];
+
+          $query = Designation::query();
+
+          // Remove global scope temporarily to fix ambiguity
+          $query->withoutGlobalScope('business_id');
+
+          $table = (new Designation)->getTable();
+          $user = Auth::user();
+          $query->where("$table.business_id", $user->business_id);
+
+          // if (Auth::check()) {
+          //     $user = Auth::user();
+
+          //     if (!$user->is_superuser) {
+          //         $query->where("$table.business_id", $user->business_id);
+          //     } else {
+          //         if ($table !== 'users') {
+          //             $query->where("$table.business_id", $user->business_id ?? 0);
+          //         }
+          //     }
+          // }
+
+          $limit = $request->input('length');
+          $start = $request->input('start');
+          $order = $columns[$request->input('order.0.column')];
+          $dir = $request->input('order.0.dir');
+
+          $totalData = $query->count();
+
+          if ($order == 'id') {
+              $order = "$table.id";
+          }
+
+          $query->orderBy($order, $dir);
+
+          if (empty($request->input('search.value'))) {
+              $designations = $query->select("$table.*", 'departments.name as department_name')
+                  ->leftJoin('departments as departments', "$table.department_id", '=', 'departments.id')
+                  ->offset($start)
+                  ->limit($limit)
+                  ->get();
+          } else {
+              $search = $request->input('search.value');
+
+              $designations = $query->select("$table.*", 'departments.name as department_name')
+                  ->leftJoin('departments as departments', "$table.department_id", '=', 'departments.id')
+                  ->where(function ($query) use ($search, $table) {
+                      $query->where("$table.id", 'like', "%{$search}%")
+                          ->orWhere("$table.name", 'like', "%{$search}%")
+                          ->orWhere("$table.code", 'like', "%{$search}%")
+                          ->orWhere("$table.notes", 'like', "%{$search}%");
+                  })
+                  ->offset($start)
+                  ->limit($limit)
+                  ->get();
+          }
+
+          $totalFiltered = $query->count();
+
+          $data = [];
+          if (!empty($designations)) {
+              foreach ($designations as $designation) {
+                  $nestedData['id'] = $designation->id;
+                  $nestedData['name'] = $designation->name;
+                  $nestedData['code'] = $designation->code;
+                  $nestedData['notes'] = $designation->notes;
+                  $nestedData['department'] = $designation->department_name;
+                  $nestedData['status'] = $designation->status;
+
+                  Log::info($nestedData);
+                  $data[] = $nestedData;
+              }
+          }
+
+          return response()->json([
+              'draw' => intval($request->input('draw')),
+              'recordsTotal' => intval($totalData),
+              'recordsFiltered' => intval($totalFiltered),
+              'code' => 200,
+              'data' => $data
+          ]);
+      } catch (Exception $e) {
+          Log::error($e->getMessage());
+          return Error::response('Something went wrong');
+      }
+  }
+
 
 
   public function addOrUpdateAjax(Request $request)

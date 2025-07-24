@@ -20,7 +20,12 @@ class ChatMessageReaction extends Model
     'created_by_id',
     'updated_by_id',
     'tenant_id',
+  'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   public function message()
   {

@@ -34,8 +34,13 @@ class LeaveRequest extends Model implements AuditableContract
     'updated_by_id',
     'tenant_id',
     'cancel_reason',
-    'cancelled_at'
+    'cancelled_at',
+ 'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   protected $casts = [
     'status' => LeaveRequestStatus::class,

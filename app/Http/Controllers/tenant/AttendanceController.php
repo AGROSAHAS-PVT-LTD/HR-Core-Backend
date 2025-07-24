@@ -17,7 +17,7 @@ class AttendanceController extends Controller
 {
   public function index()
   {
-    $users = User::where('status', UserAccountStatus::ACTIVE)
+    $users = User::where('business_id', auth()->user()->business_id)->where('status', UserAccountStatus::ACTIVE)
       ->get();
 
     $attendances = Attendance::where('created_at', date('Y-m-d'))

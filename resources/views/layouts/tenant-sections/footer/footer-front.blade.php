@@ -7,7 +7,8 @@
         <div class="col-lg-5">
           <a href="javascript:;" class="app-brand-link mb-6">
             <span class="app-brand-logo demo">@include('_partials.macros',["width"=>25,"withbg"=>'var(--bs-primary)'])</span>
-            <span class="app-brand-text demo text-white fw-bold ms-2 ps-1">{{config('variables.templateName')}}</span>
+            <span class="app-brand-text demo text-white fw-bold ms-2 ps-1">
+            {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}</span>
           </a>
           <p class="footer-text footer-logo-description mb-6">
             Most developer friendly & highly customisable Admin Dashboard Template.

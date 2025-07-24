@@ -11,19 +11,23 @@ use App\Models\SuperAdmin\Subscription;
 use App\Traits\UserActionsTrait;
 use App\Traits\UserTenantOptionsTrait;
 use Constants;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+
 class User extends Authenticatable implements JWTSubject, AuditableContract
 {
   use UserTenantOptionsTrait, HasFactory, HasApiTokens, Notifiable, HasRoles, Auditable, UserActionsTrait, SoftDeletes;
+
 
   /**
    * The attributes that are mass assignable.
@@ -60,7 +64,9 @@ class User extends Authenticatable implements JWTSubject, AuditableContract
     'relieved_reason',
     'retired_at',
     'retired_reason',
-    'is_customer'
+    'is_customer',
+
+     'business_id'
   ];
   /**
    * The attributes that should be hidden for serialization.
@@ -71,6 +77,11 @@ class User extends Authenticatable implements JWTSubject, AuditableContract
     'password',
     'remember_token',
   ];
+
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   public function getUserForProfile()
   {

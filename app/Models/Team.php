@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\TenantTrait;
+use App\Traits\TenantAware;
 use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Team extends Model implements AuditableContract
 {
-  use Auditable, UserActionsTrait, TenantTrait, SoftDeletes;
+  use Auditable, UserActionsTrait, TenantTrait, SoftDeletes, TenantAware;
 
   protected $table = 'teams';
 
@@ -26,7 +27,9 @@ class Team extends Model implements AuditableContract
     'created_by_id',
     'updated_by_id',
     'tenant_id',
+    'business_id'
   ];
+  
 
   public $casts =[
     'is_chat_enabled' => 'boolean',
@@ -41,5 +44,10 @@ class Team extends Model implements AuditableContract
   public function users()
   {
     return $this->belongsToMany(User::class, 'team_id');
+  }
+
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
   }
 }

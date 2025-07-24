@@ -1,7 +1,7 @@
 @php
   use Illuminate\Support\Facades\Session;
   $containerFooter = (isset($configData['contentLayout']) && $configData['contentLayout'] === 'compact') ? 'container-xxl' : 'container-fluid';
-  $tenant = $settings->company_name ?? config('variables.templateFullName');
+  $tenant = optional(auth()->user()->business)->name ?? config('variables.templateFullName');
 @endphp
 
   <!-- Footer-->
@@ -13,7 +13,10 @@
         <script>document.write(new Date().getFullYear());</script>
         , made with ❤️ by <a href="{{ (!empty(config('variables.creatorUrl')) ? config('variables.creatorUrl') : '') }}"
                              target="_blank"
-                             class="footer-link">{{ (!empty(config('variables.creatorName')) ? config('variables.creatorName') : '') }}</a>
+                             class="footer-link">
+                             
+                             
+                             {{ (!empty(config('variables.creatorName')) ? config('variables.creatorName') : '') }}</a>
       </div>
       <div class="d-none d-lg-inline-block">
         {{-- <a href="{{ config('variables.licenseUrl') ? config('variables.licenseUrl') : '#' }}" class="footer-link me-4" target="_blank">License</a>
@@ -25,7 +28,7 @@
            data-bs-toggle="tooltip"
            class="footer-link me-4"
            title="{{'Organization: '. $tenant}}">
-          <span class="footer-link-text">{{ $settings->company_name ?? $tenant}}</span>
+          <span class="footer-link-text">{{$tenant}}</span>
         </a>
       </div>
     </div>

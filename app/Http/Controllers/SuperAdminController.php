@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Package; // Import the Package model
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Message;
@@ -29,7 +31,7 @@ class SuperAdminController extends Controller
     
     public function checkSubcription(Request $request)
     {
-        $user = Sentinel::getUser();
+        $user = Auth::user();
         $settings = Settings::first();
         $business_id = $user->business_id;
         // Fetch the business details with related data
@@ -44,7 +46,7 @@ class SuperAdminController extends Controller
                             ->first();
                             
         // Pass packages data to the view
-        return view('selfRegister.paySubscription', compact('business','currentSubscription','settings'));
+        return view('superadmin_saas.paySubscription', compact('business','currentSubscription','settings'));
     }
     
     public function defaultRegister(Request $request, $id)

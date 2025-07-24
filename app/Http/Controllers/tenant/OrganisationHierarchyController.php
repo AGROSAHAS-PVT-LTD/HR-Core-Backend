@@ -9,7 +9,7 @@ class OrganisationHierarchyController extends Controller
 {
   public function index()
   {
-    $users = User::with(['reportingTo', 'designation'])->get();
+    $users = User::where('business_id', auth()->user()->business_id)->with(['reportingTo', 'designation'])->get();
 
     $hierarchy = $this->buildHierarchy($users);
 

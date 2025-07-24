@@ -94,7 +94,12 @@ class Settings extends Model implements AuditableContract
     'flutterwave_secret_key',
     'flutterwave_encryption_key',
 
+  'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   protected $casts = [
     'offline_check_time' => 'integer',

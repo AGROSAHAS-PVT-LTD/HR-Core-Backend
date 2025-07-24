@@ -33,7 +33,12 @@ class Site extends Model implements AuditableContract
     'geofence_group_id',
     'ip_address_group_id',
     'qr_group_id',
+'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   protected $casts = [
     'is_attendance_enabled' => 'boolean',

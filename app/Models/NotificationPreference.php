@@ -10,7 +10,12 @@ class NotificationPreference extends Model
 {
   use UserActionsTrait, TenantTrait;
 
-  protected $fillable = ['user_id', 'preferences'];
+  protected $fillable = ['user_id', 'preferences','business_id'
+  ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   protected $casts = [
     'preferences' => 'array',

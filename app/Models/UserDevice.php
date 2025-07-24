@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\TenantTrait;
 use App\Traits\UserActionsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserDevice extends Model
 {
-  use  UserActionsTrait, SoftDeletes;
+  use  UserActionsTrait, SoftDeletes, TenantTrait;
 
   protected $table = 'user_devices';
 
@@ -44,7 +45,12 @@ class UserDevice extends Model
     'created_by_id',
     'updated_by_id',
     'tenant_id',
+  'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
   protected $casts = [
     'is_online' => 'boolean',

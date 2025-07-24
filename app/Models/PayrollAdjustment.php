@@ -27,7 +27,12 @@ class PayrollAdjustment extends Model implements AuditableContract
     'tenant_id',
     'created_by_id',
     'updated_by_id',
+ 'business_id'
   ];
+  public function business()
+  {
+    return $this->belongsTo(Business::class, 'business_id');
+  }
 
 
   protected $casts = [

@@ -41,9 +41,9 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h6 class="fw-normal mb-0 text-body">@lang('Total') {{$role->users()->count()}} @lang('Users')</h6>
+              <h6 class="fw-normal mb-0 text-body">@lang('Total') {{$role->users->count()}} @lang('Users')</h6>
               <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
-                @foreach($role->users()->limit(3)->get() as $user)
+                @foreach($role->users->take(3) as $user)
                   @php
                     $randomStatusColor = ['primary', 'success', 'danger', 'warning', 'info', 'dark'];
                     $randomColor = $randomStatusColor[array_rand($randomStatusColor)];
@@ -61,11 +61,11 @@
                     @endif
                   </li>
                 @endforeach
-                @if($role->users()->count() > 3)
+                @if($role->users->count() > 3)
                   <li class="avatar">
                     <span class="avatar-initial rounded-circle pull-up" data-bs-toggle="tooltip"
                           data-bs-placement="bottom"
-                          title="{{$role->users()->count() - 3}} more">+{{$role->users()->count() - 3}}</span>
+                          title="{{count($role->users) - 3}} more">+{{count($role->users) - 3}}</span>
                   </li>
                 @endif
 

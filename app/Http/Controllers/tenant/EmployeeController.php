@@ -144,10 +144,12 @@ class EmployeeController extends Controller
 
     $users = User::where('status', UserAccountStatus::ACTIVE)
       ->where('reporting_to_id', null)
+      ->where('business_id', auth()->user()->business_id)
       ->select('id', 'first_name', 'last_name', 'code')
       ->get();
 
-    $roles = Role::get();
+    $roles = Role::whereNull('business_id')
+            ->orWhere('business_id', auth()->user()->business_id)->get();
 
     return view('tenant.employees.create', [
       'shifts' => $shifts,
@@ -261,6 +263,7 @@ class EmployeeController extends Controller
   {
     $users = User::where('status', UserAccountStatus::ACTIVE)
     //   ->where('reporting_to_id', null)
+      ->where('business_id', auth()->user()->business_id)
       ->select('id', 'first_name', 'last_name', 'code')
       ->get();
 
@@ -424,11 +427,12 @@ class EmployeeController extends Controller
 
   public function index()
   {
-    $active = User::where('status', UserAccountStatus::ACTIVE)->count();
-    $inactive = User::where('status', UserAccountStatus::INACTIVE)->count();
-    $relieved = User::where('status', UserAccountStatus::RELIEVED)->count();
+    $active = User::where('status', UserAccountStatus::ACTIVE)->where('business_id', auth()->user()->business_id)->count();
+    $inactive = User::where('status', UserAccountStatus::INACTIVE) ->where('business_id', auth()->user()->business_id)->count();
+    $relieved = User::where('status', UserAccountStatus::RELIEVED) ->where('business_id', auth()->user()->business_id)->count();
 
-    $roles = Role::select('id', 'name')
+    $roles = Role::select('id', 'name')->whereNull('business_id')
+    ->orWhere('business_id', auth()->user()->business_id)
       ->get();
 
     $teams = Team::where('status', Status::ACTIVE)
@@ -514,7 +518,7 @@ class EmployeeController extends Controller
 
       $search = [];
 
-      $totalData = User::count();
+      $totalData = User::where('business_id', auth()->user()->business_id)->count();
 
       $totalFiltered = $totalData;
 
@@ -523,7 +527,7 @@ class EmployeeController extends Controller
       $order = $columns[$request->input('order.0.column')];
       $dir = $request->input('order.0.dir');
 
-      $query = User::query();
+      $query = User::query()->where('business_id', auth()->user()->business_id);
 
       if ($request->has('roleFilter') && !empty($request->input('roleFilter'))) {
         $query->whereHas('roles', function ($q) use ($request) {
@@ -694,6 +698,7 @@ class EmployeeController extends Controller
       $user->alternate_number = $request->input('altPhone');
       $user->email = $request->input('email');
       $user->dob = $request->input('dob');
+      $user->business_id = auth()->user()->business_id;
       $user->address = $request->input('address');
 
       if ($request->has('useDefaultPassword') && $request->input('useDefaultPassword') == 'on') {

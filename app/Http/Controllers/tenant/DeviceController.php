@@ -19,6 +19,7 @@ class DeviceController extends Controller
   {
 
     $users = User::where('status', Status::ACTIVE)
+      ->where('business_id', auth()->user()->business_id)
       ->select('id', 'first_name', 'last_name', 'code')
       ->get();
 
@@ -40,6 +41,7 @@ class DeviceController extends Controller
       ];
 
       $query = UserDevice::query();
+      // $query = $query->where('business_id', auth()->user()->business_id);
 
       $limit = $request->input('length');
       $start = $request->input('start');

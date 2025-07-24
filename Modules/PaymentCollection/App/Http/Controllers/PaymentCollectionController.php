@@ -15,12 +15,12 @@ class PaymentCollectionController extends Controller
    */
   public function index(Request $request)
   {
-    $employees = User::whereNotNull('shift_id')
+    $employees = User::where('business_id', auth()->user()->business_id)->whereNotNull('shift_id')
       ->whereNotNull('team_id')
       ->select('id', 'first_name', 'last_name')
       ->get();
 
-    $paymentCollections = PaymentCollection::with('user')
+    $paymentCollections = PaymentCollection::where('business_id', auth()->user()->business_id)->with('user')
       ->with('client')
       ->orderBy('created_at', 'desc')
       ->get();
