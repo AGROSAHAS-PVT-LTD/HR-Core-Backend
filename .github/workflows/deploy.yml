@@ -100,11 +100,7 @@ jobs:
           # Install node dependencies
           yarn install --production || npm install --production
           cp .env.example .env || true
-          php artisan storage:link
-          php artisan optimize:clear
-          php artisan view:cache
-          php artisan route:cache
-          php artisan config:cache
+          
          
 
     - name: 🔒 Verify Deployment
