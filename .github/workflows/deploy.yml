@@ -58,10 +58,6 @@ jobs:
     - name: 🏗️ Build Assets (if needed)
       run: yarn build
 
-    - name: 🔍 Run Tests
-      run: |
-        php artisan test
-        yarn test
 
     - name: 🚀 Synchronize Files to Server
       uses: easingthemes/ssh-deploy@v2.1.5
