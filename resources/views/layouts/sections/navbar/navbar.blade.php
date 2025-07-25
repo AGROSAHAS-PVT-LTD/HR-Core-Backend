@@ -29,8 +29,7 @@
 
                 <span
                   class="app-brand-text demo menu-text fw-bold text-heading">
-                    {{ optional(auth()->user()->business)->name ?? config('variables.templateName') }}
-
+                  {{ optional(auth()->user()?->business)->name ?? config('variables.templateName') }}
               </span>
               </a>
 
