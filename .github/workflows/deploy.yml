@@ -49,6 +49,15 @@ jobs:
         node-version: '20'
         cache: 'yarn'
 
+    - name: 📦 Install Yarn Dependencies
+      run: |
+        yarn install --frozen-lockfile
+        yarn add vue-loader@latest
+        npx update-browserslist-db@latest
+
+    - name: 🏗️ Build Assets (if needed)
+      run: yarn build
+
 
     - name: 🚀 Synchronize Files to Server
       uses: easingthemes/ssh-deploy@v2.1.5
