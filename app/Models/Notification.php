@@ -18,7 +18,7 @@ class Notification extends Model
     'notifiable_type',
     'data',
     'read_at',
-  'business_id'
+    'business_id'
   ];
   public function business()
   {

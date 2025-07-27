@@ -17,6 +17,7 @@ class ClientController extends Controller
     $take = $request->take ?? 10;
 
     $clients = Client::query()
+      ->where('business_id', auth()->user()->business_id)
       ->where('status', 'active')
       ->orderBy('created_at', 'desc');
 
@@ -71,6 +72,7 @@ class ClientController extends Controller
     }
 
     $clients = Client::where('status', 'active')
+      ->where('business_id', auth()->user()->business_id)
       ->where('name', 'like', '%' . $query . '%')
       ->orWhere('phone', 'like', '%' . $query . '%')
       ->orWhere('email', 'like', '%' . $query . '%')
@@ -133,6 +135,7 @@ class ClientController extends Controller
       'phone' => $phoneNumber,
       'contact_person' => $contactPerson,
       'email' => $email,
+      'business_id' => auth()->user()->business_id,
       'city' => $city,
       'remarks' => $remarks,
       'created_by_id' => auth()->user()->id,

@@ -20,7 +20,9 @@ class LeaveController extends Controller
 {
   public function getLeaveTypes()
   {
-    $leaveTypes = LeaveType::where('status', Status::ACTIVE)->get();
+
+    $user = auth()->user();
+    $leaveTypes = LeaveType::where('status', Status::ACTIVE)->where('business_id', $user->business_id)->get();
 
     $response = $leaveTypes->map(function ($leaveType) {
       return [
@@ -37,10 +39,11 @@ class LeaveController extends Controller
   {
     $skip = $request->skip;
     $take = $request->take ?? 10;
-
+    $user = auth()->user();
 
     $leaveRequests = LeaveRequest::query()
       ->where('user_id', auth()->id())
+      ->where('business_id', $user->business_id)
       ->with('leaveType')
       ->orderBy('id', 'desc');
 
@@ -76,13 +79,16 @@ class LeaveController extends Controller
 
   public function uploadLeaveDocument(Request $request)
   {
+    $user = auth()->user();
     $file = $request->file('file');
 
     if ($file == null) {
       return Error::response('File is required');
     }
 
-    $lastLeaveRequest = LeaveRequest::where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+    $lastLeaveRequest = LeaveRequest::where('user_id', auth()->user()->id)
+                                      ->where('business_id', $user->business_id)
+                                      ->orderBy('id', 'desc')->first();
 
     if ($lastLeaveRequest == null) {
       return Error::response('Leave request not found');
@@ -160,6 +166,7 @@ class LeaveController extends Controller
       'to_date' => date('Y-m-d', $finalToDate),
       'leave_type_id' => $leaveTypeId,
       'remarks' => $remarks,
+      'business_id' => $user->business_id,
       'user_id' => $user->id,
     ]);
 

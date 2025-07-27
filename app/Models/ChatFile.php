@@ -25,7 +25,7 @@ class ChatFile extends Model
     'created_by_id',
     'updated_by_id',
     'tenant_id',
-  'business_id'
+    'business_id'
   ];
   public function business()
   {

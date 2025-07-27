@@ -21,7 +21,7 @@ class AttendanceBreak extends Model implements AuditableContract
     'end_time',
     'duration',
     'reason',
-  'business_id'
+    'business_id'
   ];
   
   public function business()

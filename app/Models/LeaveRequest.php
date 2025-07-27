@@ -35,7 +35,7 @@ class LeaveRequest extends Model implements AuditableContract
     'tenant_id',
     'cancel_reason',
     'cancelled_at',
- 'business_id'
+    'business_id'
   ];
   public function business()
   {

@@ -24,7 +24,8 @@ class ChatController extends Controller
   {
     $userId = auth()->id();
 
-    $chats = Chat::whereHas('participants', function ($query) use ($userId) {
+    $chats = Chat::where('business_id', auth()->user()->business_id)
+                  ->whereHas('participants', function ($query) use ($userId) {
       $query->where('user_id', $userId);
     })
       ->with(['participants.user', 'messages' => function ($query) {
@@ -62,7 +63,8 @@ class ChatController extends Controller
 
     //Check if chat already exists
     if (!$request->isGroupChat) {
-      $chat = Chat::whereHas('participants', function ($query) use ($authId) {
+      $chat = Chat::where('business_id', auth()->user()->business_id)
+                    ->whereHas('participants', function ($query) use ($authId) {
         $query->where('user_id', $authId);
       })->whereHas('participants', function ($query) use ($request) {
         $query->where('user_id', $request->participants[0]);
@@ -77,6 +79,8 @@ class ChatController extends Controller
       'name' => $request->name,
       'is_group_chat' => $request->isGroupChat,
       'created_by_id' => $authId,
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     // Add participants
@@ -85,6 +89,7 @@ class ChatController extends Controller
         'chat_id' => $chat->id,
         'user_id' => $userId,
         'created_by_id' => $authId,
+        'business_id' => auth()->user()->business_id
       ]);
     }
 
@@ -92,6 +97,7 @@ class ChatController extends Controller
       'chat_id' => $chat->id,
       'user_id' => $authId,
       'created_by_id' => $authId,
+      'business_id' => auth()->user()->business_id
     ]);
 
     $response = [
@@ -112,6 +118,7 @@ class ChatController extends Controller
     $take = $request->take ?? 10;
 
     $messages = ChatMessage::query()
+      ->where('business_id', auth()->user()->business_id)
       ->where('chat_id', $request->chatId)
       ->with(['user', 'reactions', 'readReceipts', 'chatFile'])
       ->orderBy('created_at', 'desc');
@@ -171,7 +178,8 @@ class ChatController extends Controller
     $chatId = $request->chatId;
     $lastMessageId = $request->lastMessageId;
 
-    $query = ChatMessage::where('chat_id', $chatId);
+    $query = ChatMessage::where('chat_id', $chatId) 
+                          ->where('business_id', auth()->user()->business_id);
 
     if ($lastMessageId) {
       $query->where('id', '>', $lastMessageId);
@@ -230,6 +238,8 @@ class ChatController extends Controller
       'user_id' => auth()->id(),
       'content' => $request->message,
       'message_type' => $request->messageType ?? 'text',
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     $msg = $message->content;
@@ -263,6 +273,8 @@ class ChatController extends Controller
       'chat_id' => $chatId,
       'user_id' => auth()->id(),
       'message_type' => $request->type,
+      'business_id' => auth()->user()->business_id
+
     ]);
 
 
@@ -274,7 +286,9 @@ class ChatController extends Controller
       'file_extension' => $file->extension(),
       'file_name' => $file->getClientOriginalName(),
       'file_size' => $file->getSize(),
-      'chat_message_id' => $message->id
+      'chat_message_id' => $message->id,
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     $msg = 'Shared a ' . $request->type;
@@ -293,13 +307,16 @@ class ChatController extends Controller
 
     $chatMessage = ChatMessage::find($request->messageId);
 
-    $file = ChatFile::where('chat_message_id', $chatMessage->id)->first();
+    $file = ChatFile::where('chat_message_id', $chatMessage->id)
+                      ->where('business_id', auth()->user()->business_id)->first();
 
     $message = ChatMessage::create([
       'chat_id' => $chatId,
       'user_id' => auth()->id(),
       'is_forwarded' => true,
-      'message_type' => $file->file_type,
+      'message_type' => $file->file_type, 
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     ChatFile::create([
@@ -310,7 +327,9 @@ class ChatController extends Controller
       'file_extension' => $file->file_extension,
       'file_name' => $file->file_name,
       'file_size' => $file->file_size,
-      'chat_message_id' => $message->id
+      'chat_message_id' => $message->id,        
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     $msg = 'Shared a ' . $file->file_type;
@@ -320,7 +339,7 @@ class ChatController extends Controller
     return Success::response($message->id);
   }
 
-  public function markAsRead($messageId)
+  public function markAsReadOld($messageId)
   {
     ChatMessageReadReceipt::updateOrCreate(
       ['chat_message_id' => $messageId, 'user_id' => auth()->id()],
@@ -330,9 +349,29 @@ class ChatController extends Controller
     return Success::response('Message marked as read');
   }
 
+  public function markAsRead($messageId)
+  {
+      $user = auth()->user();
+
+      ChatMessageReadReceipt::updateOrCreate(
+          [
+              'chat_message_id' => $messageId,
+              'user_id' => $user->id,
+              'business_id' => $user->business_id
+          ],
+          [
+              'read_at' => now()
+          ]
+      );
+
+      return Success::response('Message marked as read');
+  }
+
+      // ->where('business_id', auth()->user()->business_id)
+
   // Mark a message as read
 
-  public function addReaction(Request $request, $messageId)
+  public function addReactionOld(Request $request, $messageId)
   {
     $request->validate(['reaction' => 'required|string']);
 
@@ -344,6 +383,30 @@ class ChatController extends Controller
     return Success::response('Reaction added successfully');
   }
 
+
+  public function addReaction(Request $request, $messageId)
+  {
+      $request->validate([
+          'reaction' => 'required|string',
+      ]);
+
+      $user = auth()->user();
+
+      ChatMessageReaction::updateOrCreate(
+          [
+              'chat_message_id' => $messageId,
+              'user_id' => $user->id,
+              'business_id' => $user->business_id
+          ],
+          [
+              'reaction' => $request->reaction
+          ]
+      );
+
+      return Success::response('Reaction added successfully');
+  }
+
+
   // Add reaction to a message
 
   public function addParticipant(Request $request, $chatId)
@@ -353,7 +416,9 @@ class ChatController extends Controller
     ChatParticipant::create([
       'chat_id' => $chatId,
       'user_id' => $request->userId,
-      'created_by_id' => auth()->id(),
+      'created_by_id' => auth()->id(),        
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     return Success::response('Participant added successfully');
@@ -374,7 +439,9 @@ class ChatController extends Controller
       'chat_id' => $chat_id,
       'uploaded_by_id' => auth()->id(),
       'file_path' => $filePath,
-      'file_type' => $file->extension(),
+      'file_type' => $file->extension(),        
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     return Success::response(['filePath' => $filePath]);
@@ -385,6 +452,7 @@ class ChatController extends Controller
   public function getParticipants($chatId)
   {
     $participants = ChatParticipant::where('chat_id', $chatId)
+      ->where('business_id', auth()->user()->business_id)
       ->with('user')
       ->get();
 

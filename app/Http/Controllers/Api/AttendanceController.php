@@ -31,6 +31,7 @@ class AttendanceController extends Controller
     $take = $request->take ?? 10;
 
     $attendances = Attendance::query()
+      ->where('business_id', auth()->user()->business_id)
       ->where('user_id', auth()->id())
       ->whereNot('check_out_time', null)
       ->orderBy('created_at', 'desc');
@@ -94,6 +95,7 @@ class AttendanceController extends Controller
     }
 
     $attendance = Attendance::where('user_id', auth()->user()->id)
+      ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', Carbon::today())
       ->first();
 
@@ -110,6 +112,7 @@ class AttendanceController extends Controller
   public function canCheckOut()
   {
     $attendance = Attendance::where('user_id', auth()->user()->id)
+      ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', Carbon::today())
       ->first();
 
@@ -135,9 +138,11 @@ class AttendanceController extends Controller
     $user = auth()->user();
 
     $device = UserDevice::where('user_id', $user->id)
+      ->where('business_id', auth()->user()->business_id)
       ->first();
 
     $attendance = Attendance::where('user_id', $user->id)
+      ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', Carbon::today())
       ->with('attendanceLogs')
       ->first();
@@ -182,6 +187,7 @@ class AttendanceController extends Controller
     //Leave Check
     $isOnLeave = false;
     $leave = LeaveRequest::where('user_id', $user->id)
+      ->where('business_id', auth()->user()->business_id)
       ->where('status', 'approved')
       ->where('from_date', '<=', Carbon::today())
       ->where('to_date', '>=', Carbon::today())
@@ -196,6 +202,7 @@ class AttendanceController extends Controller
     $breakStartedAt = '';
     if ($attendance && $attendance->status == 'checked_in') {
       $break = AttendanceBreak::where('attendance_log_id', $attendance->todaysLatestAttendanceLog()->id)
+        ->where('business_id', auth()->user()->business_id)
         ->whereNull('end_time')
         ->first();
 
@@ -280,6 +287,7 @@ class AttendanceController extends Controller
     $user = auth()->user();
 
     $attendance = Attendance::where('user_id', $user->id)
+     ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', now())
       ->first();
 
@@ -291,7 +299,8 @@ class AttendanceController extends Controller
         'site_id' => $user->attendance_type == 'site' ? $user->site_id : null,
         'late_reason' => $request->lateReason,
         'shift_id' => $user->shift_id,
-        'created_by_id' => $user->id
+        'created_by_id' => $user->id,
+        'business_id' => $user->business_id
       ]);
     } else if ($attendance->status == 'checked_out' && Settings::first()->is_multiple_check_in_enabled) {
       $attendance->status = 'checked_in';
@@ -308,8 +317,8 @@ class AttendanceController extends Controller
     $log->latitude = $request->latitude;
     $log->longitude = $request->longitude;
     $log->created_by_id = $user->id;
+    $log->business_id = $user->business_id;
     $log->save();
-
 
     Activity::create([
       'attendance_log_id' => $log->id,
@@ -322,6 +331,7 @@ class AttendanceController extends Controller
       'signal_strength' => $request->signalStrength,
       'type' => 'checked_in',
       'created_by_id' => $user->id,
+      'business_id' => $user->business_id,
       'accuracy' => 100,
       'bearing' => $request->bearing,
       'horizontalAccuracy' => $request->horizontalAccuracy,
@@ -345,6 +355,7 @@ class AttendanceController extends Controller
     $user = auth()->user();
 
     $attendance = Attendance::whereDate('created_at', Carbon::today())
+     ->where('business_id', auth()->user()->business_id)
       ->where('user_id', $user->id)
       ->first();
 
@@ -369,6 +380,7 @@ class AttendanceController extends Controller
     $log->latitude = $request->latitude;
     $log->longitude = $request->longitude;
     $log->created_by_id = $user->id;
+    $log->business_id = $user->business_id;
     $log->save();
 
     Activity::create([
@@ -389,7 +401,8 @@ class AttendanceController extends Controller
       'course' => $request->course,
       'courseAccuracy' => $request->courseAccuracy,
       'speed' => $request->speed,
-      'speedAccuracy' => $request->speedAccuracy
+      'speedAccuracy' => $request->speedAccuracy,
+      'business_id' => $user->business_id
     ]);
 
 
@@ -421,6 +434,7 @@ class AttendanceController extends Controller
     }
 
     $attendanceLog = AttendanceLog::where('created_by_id', auth()->id())
+     ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', Carbon::today())
       ->latest()
       ->first();
@@ -455,7 +469,9 @@ class AttendanceController extends Controller
       'courseAccuracy' => $request->courseAccuracy,
       'speed' => $request->speed,
       'speedAccuracy' => $request->speedAccuracy,
-      'created_by_id' => auth()->id()
+      'created_by_id' => auth()->id(),
+      'business_id' => auth()->user()->business_id
+
     ]);
 
     return Success::response('Status updated successfully');

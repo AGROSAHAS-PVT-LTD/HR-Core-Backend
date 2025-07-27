@@ -55,6 +55,8 @@ class VisitController extends Controller
     }
 
     $attendance = Attendance::where('user_id', auth()->user()->id)
+     ->where('business_id', auth()->user()->business_id)
+
       ->whereDate('created_at', Carbon::now())
       ->first();
 
@@ -74,9 +76,9 @@ class VisitController extends Controller
       'longitude' => $longitude,
       'address' => $address,
       'created_by_id' => auth()->user()->id,
+      'business_id' => auth()->user()->business_id,
       'img_url' => $fileName
     ]);
-
     NotificationHelper::notifyAdminHR(new NewVisit($visit));
 
     return Success::response('Visit created successfully');
@@ -86,10 +88,12 @@ class VisitController extends Controller
   public function getVisitsCount()
   {
     $todaysVisits = Visit::where('created_by_id', auth()->user()->id)
+     ->where('business_id', auth()->user()->business_id)
       ->whereDate('created_at', Carbon::now())
       ->count();
 
     $totalVisits = Visit::where('created_by_id', auth()->user()->id)
+     ->where('business_id', auth()->user()->business_id)
       ->count();
 
     return Success::response([
@@ -104,6 +108,7 @@ class VisitController extends Controller
     $take = $request->take ?? 10;
 
     $visits = Visit::query()
+     ->where('business_id', auth()->user()->business_id)
       ->where('created_by_id', auth()->id())
       ->with('client')
       ->orderBy('created_at', 'desc');

@@ -18,7 +18,8 @@ class ExpenseController extends Controller
 {
   public function getExpenseTypes()
   {
-    $expenseTypes = ExpenseType::where('status', 1)->get();
+    $user = auth()->user();
+    $expenseTypes = ExpenseType::where('status', 1)->where('business_id', $user->business_id)->get();
 
     $response = $expenseTypes->map(function ($expenseType) {
       return [
@@ -33,11 +34,13 @@ class ExpenseController extends Controller
 
   public function getExpenseRequests(Request $request)
   {
+    $user = auth()->user();
     $skip = $request->skip;
     $take = $request->take ?? 10;
 
 
     $expenseRequests = ExpenseRequest::query()
+      ->where('business_id', $user->business_id)
       ->where('user_id', auth()->id())
       ->with('expenseType')
       ->orderBy('id', 'desc');
@@ -100,14 +103,14 @@ class ExpenseController extends Controller
 
   public function uploadExpenseDocument(Request $request)
   {
-
+    $user = auth()->user();
     $file = $request->file('file');
 
     if ($file == null) {
       Error::response('File is required');
     }
 
-    $lastExpenseRequest = ExpenseRequest::where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+    $lastExpenseRequest = ExpenseRequest::where('user_id', auth()->user()->id)->where('business_id', $user->business_id)->orderBy('id', 'desc')->first();
 
     if ($lastExpenseRequest == null) {
       Error::response('No expense request found');
@@ -125,6 +128,7 @@ class ExpenseController extends Controller
 
   public function createExpenseRequest(Request $request)
   {
+
     $date = $request->date;
     $amount = $request->amount;
     $expenseTypeId = $request->typeId;
@@ -151,15 +155,15 @@ class ExpenseController extends Controller
     }
 
     $finalForDate = strtotime($date);
-
+    $user = auth()->user();
     $expenseRequest = new ExpenseRequest();
     $expenseRequest->user_id = auth()->user()->id;
+    $expenseRequest->business_id = $user->business_id;
     $expenseRequest->for_date = date('Y-m-d', $finalForDate);
     $expenseRequest->amount = $amount;
     $expenseRequest->expense_type_id = $expenseTypeId;
     $expenseRequest->remarks = $remarks;
     $expenseRequest->status = 'pending';
-
     $expenseRequest->save();
 
     NotificationHelper::notifyAdminHR(new NewExpenseRequest($expenseRequest));

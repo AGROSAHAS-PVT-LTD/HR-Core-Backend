@@ -119,6 +119,7 @@ class DeviceController extends Controller
 
     $device = new UserDevice();
     $device->user_id = auth()->user()->id;
+    $device->business_id = auth()->user()->business_id;
     $device->device_id = $deviceId;
     $device->device_type = $deviceType;
     $device->brand = $brand;
@@ -198,6 +199,7 @@ class DeviceController extends Controller
     $device->courseAccuracy = $request->courseAccuracy;
     $device->speed = $request->speed;
     $device->speedAccuracy = $request->speedAccuracy;
+    $device->business_id = auth()->user()->business_id;
     $device->save();
 
     $this->createDeviceLog($device, $request->uid);
@@ -260,6 +262,8 @@ class DeviceController extends Controller
     $deviceLog->speed = $device->speed;
     $deviceLog->speedAccuracy = $device->speedAccuracy;
     $deviceLog->created_by_id = auth()->id();
+    $deviceLog->business_id = auth()->user()->business_id;
+
     //Location Info End
     $deviceLog->save();
   }

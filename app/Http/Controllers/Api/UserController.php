@@ -17,6 +17,7 @@ class UserController extends Controller
   public function searchUsers($query)
   {
     $users = User::where('status', UserAccountStatus::ACTIVE)
+     ->where('business_id', auth()->user()->business_id)
       ->whereNot('id', auth()->id())
       ->where(function ($q) use ($query) {
         $q->where('first_name', 'like', "%$query%")
@@ -58,7 +59,8 @@ class UserController extends Controller
     $take = (int)$request->input('take', 10);
 
     $users = User::where('status', UserAccountStatus::ACTIVE)
-      ->whereNot('id', auth()->id())
+     ->where('business_id', auth()->user()->business_id)
+      // ->whereNot('id', auth()->id())
       ->with('designation')
       ->skip($skip)->take($take)
       ->orderBy('first_name', 'asc')

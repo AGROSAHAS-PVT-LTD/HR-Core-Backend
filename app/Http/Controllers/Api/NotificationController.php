@@ -21,6 +21,7 @@ class NotificationController extends Controller
     $take = $validated['take'] ?? 10;
 
     $query = Notification::where('notifiable_id', auth()->id())
+     ->where('business_id', auth()->user()->business_id)
       ->where('notifiable_type', 'App\Models\User');
 
     if (isset($validated['isRead'])) {
