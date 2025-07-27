@@ -11,25 +11,26 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 
   <!-- ! Hide app brand if navbar-full -->
-  @if(!isset($navbarFull))
-    <div class="app-brand demo">
-      <a href="{{url('/')}}" class="app-brand-link">
-        <span
-          class="app-brand-logo demo">
-          @if(!$settings->company_name)
-            <img src="{{asset('assets/img/logo.png')}}" alt="Logo" width="27">
-          @endif
-        </span>
-        <span class="app-brand-text demo menu-text fw-bold ms-2">
-          {{$settings->company_name ?? config('variables.templateName')}}
-        </span>
-      </a>
 
-      <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
-        <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
-      </a>
-    </div>
-  @endif
+  @if(!isset($navbarFull))
+  <div class="app-brand demo">
+    <a href="{{ url('/') }}" class="app-brand-link">
+      <span class="app-brand-logo demo">
+        @if(empty($settings->company_name))
+          <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" width="27">
+        @endif
+      </span>
+      <span class="app-brand-text demo menu-text fw-bold ms-2">
+        {{ auth()->check() && auth()->user()->business ? auth()->user()->business->name : ($settings->company_name ?? config('variables.templateName')) }}
+      </span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+      <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
+    </a>
+  </div>
+@endif
+
 
   <div class="menu-inner-shadow"></div>
   <ul class="menu-inner py-1">

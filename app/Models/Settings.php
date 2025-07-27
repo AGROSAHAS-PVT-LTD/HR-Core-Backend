@@ -10,7 +10,9 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 class Settings extends Model implements AuditableContract
 {
-  use Auditable, TenantTrait;
+  // use Auditable, TenantTrait;
+  use Auditable;
+
 
   public $timestamps = false;
   protected $table = 'settings';
