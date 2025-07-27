@@ -10,12 +10,20 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function indexOld()
     {
         $clients = Client::all();
 
         return view('tenant.client.index', compact('clients'));
     }
+
+    public function index()
+    {
+        $clients = Client::latest()->get(); // latest() = orderBy('created_at', 'desc')
+
+        return view('tenant.client.index', compact('clients'));
+    }
+
 
     public function show($id)
     {
