@@ -20,7 +20,8 @@
           <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" width="27">
         @endif
       </span>
-      <span class="app-brand-text demo menu-text fw-bold ms-2">
+      <span class="app-brand-text demo menu-text fw-bold ms-2" 
+            style="font-size: 1rem; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;">
         {{ auth()->check() && auth()->user()->business ? auth()->user()->business->name : ($settings->company_name ?? config('variables.templateName')) }}
       </span>
     </a>
