@@ -99,7 +99,7 @@ jobs:
           fi
           # Install node dependencies
           yarn install --production || npm install --production
-          cp .env.example .envv || true
+          cp .env.example .env || true
           
          
 

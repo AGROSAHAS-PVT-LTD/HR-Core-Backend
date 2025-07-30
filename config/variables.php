@@ -1,13 +1,13 @@
 <?php
 // Variables
 return [
-  "creatorName" => "Digifrica Limited",
+  "creatorName" => "Worknest Core",
   "creatorUrl" => "https://digifrica.com",
   "supportNumber" => "+256 700 100001",
   "supportWhatsappURL" => "https://wa.me/+256700100001",
   "supportEmail" => "info@digifrica.com",
-  "templateName" => "Digifrica Open HR Core",
-  "templateFullName" => "Digifrica Open HR Core",
+  "templateName" => "Worknest Core",
+  "templateFullName" => "Worknest Core",
   "templateSuffix" => "",
   "templateVersion" => "4.0.0",
   "templateFree" => false,
