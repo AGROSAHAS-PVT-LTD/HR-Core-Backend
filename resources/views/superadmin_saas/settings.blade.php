@@ -420,7 +420,7 @@
                            style="width: 150px; height: 150px; overflow: hidden; cursor: pointer; background: #f8f9fa;"
                            onclick="document.getElementById('companyLogo').click();">
                         <img id="companyLogoPreview"
-                             src="{{ $settings->company_logo ? asset('images/'.$settings->company_logo) : 'https://placehold.co/150x150' }}"
+                             src="{{ $settings->company_logo ? asset('storage/images/'.$settings->company_logo) : 'https://placehold.co/150x150' }}"
                              alt="Company Logo"
                              class="img-fluid"
                              style="max-width: 100%; max-height: 100%;">
