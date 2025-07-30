@@ -165,7 +165,7 @@
             const formData = new FormData(this);
             formData.append('businessId', businessId);
             // Send data using fetch API
-            fetch(`/public/superadmin/businesses/add-subscription`, {
+            fetch(`/superadmin/businesses/add-subscription`, {
                 method: 'POST', // Or 'PUT' if preferred
                 headers: {
                     'X-CSRF-TOKEN': csrfToken
@@ -199,7 +199,7 @@
             formData.append('businessId', businessId);
             
             // Send data using fetch API
-            fetch(`/public/superadmin/add-subscription`, {
+            fetch(`/superadmin/add-subscription`, {
                 method: 'POST',
                 headers: {
                      'Content-Type': 'application/json',
@@ -222,13 +222,13 @@
     }
     
     function openSubscriptionModal(businessId) {
-        document.getElementById('subscriptionForm').action = `/public/superadmin/businesses-add-subscription/${businessId}`;
+        document.getElementById('subscriptionForm').action = `/superadmin/businesses-add-subscription/${businessId}`;
         new bootstrap.Modal(document.getElementById('subscriptionModal')).show();
     }
 
     function toggleBusinessStatus(businessId, isActive) {
 
-        fetch(`/public/superadmin/businesses/toggle-status/${businessId}`, {
+        fetch(`/superadmin/businesses/toggle-status/${businessId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

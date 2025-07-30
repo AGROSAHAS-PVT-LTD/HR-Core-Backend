@@ -163,7 +163,7 @@
 <script>
     function openStatusModal(id, status, paymentTransactionId) {
         // Set the form action URL
-        document.getElementById('statusForm').action =   `/public/superadmin/subscriptions/update-status/${id}`;
+        document.getElementById('statusForm').action =   `/superadmin/subscriptions/update-status/${id}`;
         
         // Set the current values in the modal
         document.getElementById('status').value = status;
@@ -174,7 +174,7 @@
 
     function openEditModal(id, startDate, endDate, trialEndDate) {
         // Set the form action URL
-        document.getElementById('editForm').action = `/public/superadmin/subscriptions/update-dates/${id}`;
+        document.getElementById('editForm').action = `/superadmin/subscriptions/update-dates/${id}`;
         // Set the current values in the modal
         document.getElementById('start_date').value = startDate;
         document.getElementById('end_date').value = endDate;

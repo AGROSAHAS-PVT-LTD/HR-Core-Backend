@@ -358,7 +358,7 @@
 <script>
     function toggleUserStatus(userId, isActive) {
         const newStatus = isActive ? 'active' : 'inactive';
-        fetch(`/public/superadmin/users/toggle-status/${userId}`, {
+        fetch(`/superadmin/users/toggle-status/${userId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -378,7 +378,7 @@
     }
 
     function openPasswordResetModal(userId) {
-        document.getElementById('passwordResetForm').action = `/public/superadmin/users/reset-password/${userId}`;
+        document.getElementById('passwordResetForm').action = `/superadmin/users/reset-password/${userId}`;
         new bootstrap.Modal(document.getElementById('passwordResetModal')).show();
     }
 </script>
