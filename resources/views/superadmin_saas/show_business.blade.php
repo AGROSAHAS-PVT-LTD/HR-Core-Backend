@@ -283,17 +283,40 @@
                                     </td>
                                     <td>{{ $user->roles()->first()->name }}</td>
                                     <td>{{ $user->phone_number ?? 'N/A' }}</td>
+                                    <!-- <td>
+                                    
+                                        <span class="badge bg-secondary">
+                                            {{ $user->status }}
+                                        </span>
+                                    </td> -->
+
                                     <td>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch" 
-                                                   id="statusSwitch{{ $user->id }}" 
-                                                   onchange="toggleUserStatus({{ $user->id }}, this.checked)"
-                                                   {{ $user->status == 'active' ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="statusSwitch{{ $user->id }}">
-                                                {{ ($user->status) }}
-                                            </label>
-                                        </div>
-                                    </td>
+                                    @php
+                                        $status = is_string($user->status) ? $user->status : $user->status->value;
+
+                                        $statusColors = [
+                                            'active' => 'success',
+                                            'inactive' => 'danger',
+                                            'pending' => 'warning',
+                                            'deleted' => 'dark',
+                                            'approved' => 'success',
+                                            'blocked' => 'danger',
+                                            'onboarding' => 'info',
+                                            'retired' => 'secondary',
+                                            'suspended' => 'danger',
+                                            'rejected' => 'danger',
+                                            'invited' => 'primary',
+                                            'registered' => 'primary',
+                                            'relieved' => 'secondary',
+                                        ];
+
+                                        $color = $statusColors[$status] ?? 'secondary';
+                                    @endphp
+                                    <span class="badge bg-{{ $color }}">
+                                        {{ ucfirst($status) }}
+                                    </span>
+                                </td>
+
                                     <td>
                                         <div class="d-flex gap-2">
                                             <button class="btn btn-sm btn-outline-primary" onclick="openPasswordResetModal({{ $user->id }}, '{{ $user->first_name }} {{ $user->last_name }}')">

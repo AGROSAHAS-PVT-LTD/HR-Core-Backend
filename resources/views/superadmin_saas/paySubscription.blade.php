@@ -80,6 +80,9 @@
     @endif
     @endif
 
+
+    
+
     <!-- Business Overview Cards -->
     <div class="row g-4 mb-4">
         <!-- Business Card -->
@@ -215,6 +218,118 @@
             </div>
         </div>
     </div>
+
+<!-- Show Packages Section only if no active subscription or trial -->
+    @if(!$currentSubscription || !$currentSubscription->isActive() || $currentSubscription->isInTrialPeriod())
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-box-open me-2"></i>Available Packages</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                @foreach($packages as $package)
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 package-card {{ $package->mark_package_as_popular ? 'border-primary border-2' : '' }}">
+                        @if($package->mark_package_as_popular)
+                        <div class="ribbon ribbon-top-right">
+                            <span class="bg-primary">POPULAR</span>
+                        </div>
+                        @endif
+                        
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">{{ $package->name }}</h5>
+                            <span class="badge {{ $package->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                {{ $package->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        
+                        <div class="card-body">
+                            
+                            <!-- Pricing Section -->
+                            <div class="package-pricing mb-3">
+                                @if($package->has_yearly_plan && $package->yearly_price)
+                                    <div class="d-flex justify-content-between align-items-end mb-2">
+                                        <div>
+                                            <h3 class="mb-0 text-primary">{{ number_format($package->price, 2) }}</h3>
+                                            <small class="text-muted">
+                                                per month ({{ $settings->currency_symbol ?? '$' }})
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <h4 class="mb-0">{{ number_format($package->yearly_price, 2) }}</h4>
+                                            <small class="text-muted">
+                                                per year (save {{ calculateYearlyDiscount($package->price, $package->yearly_price) }}%)
+                                            </small>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="package-price text-center">
+                                        <h3 class="mb-0">{{ $settings->currency_symbol ?? '$' }} {{ number_format($package->price, 2) }}</h3>
+                                        <small class="text-muted">
+                                            per 
+                                            @if($package->interval_count > 1)
+                                                {{ $package->interval_count }} {{ \Illuminate\Support\Str::plural($package->interval, $package->interval_count) }}
+                                            @else
+                                                {{ $package->interval }}
+                                            @endif
+                                        </small>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Features Section -->
+                            <div class="package-features mb-3">
+                                <h6 class="mb-2">Key Features:</h6>
+                                @php
+                                    $features = json_decode($package->features, true);
+                                    $featureCount = is_array($features) ? count(array_filter($features)) : 0;
+                                @endphp
+                                
+                                @if($featureCount > 0)
+                                <ul class="list-unstyled">
+                                    @foreach(array_slice(array_keys(array_filter($features)), 0, 10) as $feature)
+                                        <li class="mb-1"><i class="fas fa-check-circle text-success me-2"></i>{{ $feature }}</li>
+                                    @endforeach
+                                    @if($featureCount > 10)
+                                        <li class="text-muted">+ {{ $featureCount - 10 }} more features</li>
+                                    @endif
+                                </ul>
+                                @else
+                                <span class="text-muted">No features selected</span>
+                                @endif
+                            </div>
+                            
+                            <!-- Package Meta Information -->
+                            <div class="package-meta small text-muted">
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <i class="fas fa-users me-1"></i>
+                                        {{ $package->user_count }} users
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ $package->trial_days ?? 0 }} trial days
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-transparent text-center">
+                            <form action="" method="POST">
+                                @csrf
+                                <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-shopping-cart me-1"></i> Subscribe Now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Subscription History Table -->
     <div class="card border-0 shadow-sm">
@@ -396,11 +511,80 @@
     .table-hover tbody tr:hover {
         background-color: rgba(0, 123, 255, 0.05);
     }
+
+
 </style>
 
 @endsection
 
 
+@section('page-style')
+<style>
+    .package-card {
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .package-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .package-card .card-header {
+        margin-top: 10px;
+        background-color: rgba(0, 0, 0, 0.03);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .package-pricing {
+        background-color: rgba(0, 0, 0, 0.02);
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    .package-price {
+        text-align: center;
+    }
+    
+    .ribbon {
+        width: 100px;
+        height: 88px;
+        overflow: hidden;
+        position: absolute;
+    }
+    
+    .ribbon::before,
+    .ribbon::after {
+        position: absolute;
+        z-index: -1;
+        content: '';
+        display: block;
+        border: 5px solid #2980b9;
+    }
+    
+    .ribbon span {
+        position: absolute;
+        display: block;
+        width: 120px;
+        padding: 5px 0;
+        background-color: #3498db;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        color: #fff;
+        font-size: 0.7rem;
+        text-align: center;
+        right: -5px;
+        top: 0px;
+        transform: rotate(360deg);
+    }
+    
+    @media (max-width: 767.98px) {
+        .package-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+@endsection
 
 @section('scripts')
 <script src="https://checkout.flutterwave.com/v3.js"></script>
@@ -476,3 +660,14 @@
     }
 </script>
 @endsection
+
+@php
+    // Helper function to calculate yearly discount percentage
+    function calculateYearlyDiscount($monthlyPrice, $yearlyPrice) {
+        if (!$monthlyPrice || !$yearlyPrice) return 0;
+        
+        $monthlyTotal = $monthlyPrice * 12;
+        $discount = (($monthlyTotal - $yearlyPrice) / $monthlyTotal) * 100;
+        return round($discount, 0);
+    }
+@endphp

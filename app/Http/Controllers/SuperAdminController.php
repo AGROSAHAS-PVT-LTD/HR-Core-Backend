@@ -44,9 +44,81 @@ class SuperAdminController extends Controller
                             })
                             ->latest('end_date')
                             ->first();
-                            
-        // Pass packages data to the view
-        return view('superadmin_saas.paySubscription', compact('business','currentSubscription','settings'));
+        $packages = Package::where('is_active', 1)->paginate(10);                    
+        // Pass packages data to the view which are active 
+        return view('superadmin_saas.paySubscription', compact('packages','business','currentSubscription','settings'));
+    }
+
+    public function privacyPolicy()
+    {
+        return view('selfRegister.privacy-policy');
+    }
+    
+    public function inAppPaySubcription(Request $request)
+    {
+        // Retrieve parameters from the query string
+        $settings = Settings::first();
+        $planType = $request->input('plan_type');
+        $packageId = $request->input('package_id');
+        $subscriptionID = 0;
+        $subscription = null;
+        $userId = $request->input('user_id');
+        $package = Package::find($packageId);
+        $user = User::find($userId);
+        $business = Business::with(['subscriptions', 'users'])->findOrFail($user->business_id);
+        
+        if (!$package || !$user) {
+            return redirect()->back()->withErrors(['error' => 'Invalid Package or User selected.']);
+        }
+        $price = $package->price;
+        if ($planType === 'yearly') {
+            $price = $package->yearly_price;
+        }
+
+        DB::beginTransaction();
+        
+        try {
+            
+            // Check for an existing subscription with status = 'waiting'
+            $subscription = Subscription::where('package_id', $package->id)
+            ->where('business_id', $business->id)
+            ->where('status', 'waiting')
+            ->first();
+            
+            
+            
+            $subscriptionData = [
+                'user_id' => $user->id, // link the subscription to the owner
+                'package_id' => $package->id, // Package ID from the selected Package
+                'start_date' => now(), // Assuming the subscription starts now
+                'end_date' => now()->add($package->interval_count, $package->interval), // Dynamically add subscription duration
+                'business_id' => $business->id, // Link the subscription to the created business
+                // 'payment_transaction_id' => $request->input('transaction_id'), // Transaction ID from the form
+                // 'paid_via' => $request->input('paid_via'), // Payment method from the form
+                'trial_end_date' => $package->trial_days ? now()->addDays($package->trial_days) : null, // Trial end date from the package's trial_days
+                'original_price' => $price, // Price from the selected Package
+                'package_price' =>  $price, // Package price from the selected Package
+                'package_details' => $package->details, // Package details from the selected Package
+            ];
+            
+            if ($subscription) {
+                // Update existing subscription
+                $subscription->update($subscriptionData);
+            } else {
+                // Create a new subscription
+                $subscription = Subscription::create($subscriptionData);
+            }
+            DB::commit();
+            $subscriptionID = $subscription->id;
+            // redirect to this very page and add param status=success
+        }
+        catch (\Exception $e) {
+            DB::rollBack();
+            // return back()->withErrors(['error' => 'Failed to create business and owner: ' . $e->getMessage()]);
+             // redirect to this very page and add param status=success
+            return redirect()->back()->withErrors(['error' => 'Failed to create subscription. Please try again later.']);
+        }
+        return view('selfRegister.inAppPaySubscription', compact('package', 'user','business','settings','subscriptionID','subscription'));
     }
     
     public function defaultRegister(Request $request, $id)
@@ -465,7 +537,7 @@ class SuperAdminController extends Controller
         return view('superadmin_saas.form_package', compact('package')); // You need to create this view for the add form
     }
     // Function to store the new package in the database
-    public function storePackage(Request $request)
+    public function storePackageOld(Request $request)
     {
         // Validate incoming request data
         $validatedData = $request->validate([
@@ -473,7 +545,8 @@ class SuperAdminController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             // 'duration' => 'required|integer|min:1',
-            // 'features' => 'required|string',
+            'features' => 'required|array', 
+            'features.*' => 'string',
             'is_one_time' => 'required|boolean',
             'is_active' => 'required|boolean',
             'trial_days' => 'nullable|integer|min:0',
@@ -483,11 +556,65 @@ class SuperAdminController extends Controller
             'mark_package_as_popular' => 'required|boolean',
         ]);
         // Create the new package
-        Package::create($validatedData);
+
+        $package = Package::create($validatedData);
+        $features = array_fill_keys($validated['features'], 'true');
+        $package->features = json_encode($features); 
+        $package->save();
+
 
         // Redirect to the package list with a success message
         return redirect()->route('superadmin.packages')->with('success', 'Package added successfully!');
     }
+
+    public function storePackage(Request $request)
+    {
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'yearly_price' => 'required|numeric|min:1',
+            'features' => 'required|array',
+            'features.*' => 'string',
+            'is_one_time' => 'required|boolean',
+            'is_active' => 'required|boolean',
+            'trial_days' => 'nullable|integer|min:0',
+            'interval' => 'required|in:days,months,years',
+            'interval_count' => 'required|integer|min:1',
+            'user_count' => 'required|integer|min:1',
+            'mark_package_as_popular' => 'required|boolean',
+        ]);
+        
+        $validatedSavedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'yearly_price' => 'required|numeric|min:1',
+            'is_one_time' => 'required|boolean',
+            'is_active' => 'required|boolean',
+            'has_yearly_plan' => 'required|boolean',
+            'trial_days' => 'nullable|integer|min:0',
+            'interval' => 'required|in:days,months,years',
+            'interval_count' => 'required|integer|min:1',
+            'user_count' => 'required|integer|min:1',
+            'mark_package_as_popular' => 'required|boolean',
+        ]);
+    
+        // Create the new package
+        $package = Package::create($validatedSavedData);
+    
+        // Process and save features
+        
+        $features = array_fill_keys($validatedData['features'] ?? [], true);
+        $package->features = json_encode($features);
+        $package->save();
+    
+        // Redirect to the package list with a success message
+        return redirect()->route('superadmin.packages')->with('success', 'Package added successfully!');
+    }
+
+
     // To edit a package at URL superadmin/packages/edit/{id}
     public function editPackages($id)
     {
@@ -495,12 +622,47 @@ class SuperAdminController extends Controller
         return view('superadmin_saas.form_package', compact('package')); // Pass the package to the view
     }
     // Function to update package
+
     public function updatePackages(Request $request, $id)
     {
+        // Find the package by ID or throw an error if not found
         $package = Package::findOrFail($id);
-        $package->update($request->all());
-        return redirect()->route('superadmin.packages')->with('success', 'Package updated successfully');
+    
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'yearly_price' => 'required|numeric|min:1',
+            'features' => 'nullable|array',
+            'features.*' => 'string',
+            'is_one_time' => 'required|boolean',
+            'is_active' => 'required|boolean',
+            'has_yearly_plan' => 'required|boolean',
+            'trial_days' => 'nullable|integer|min:0',
+            'interval' => 'required|in:days,months,years',
+            'interval_count' => 'required|integer|min:1',
+            'user_count' => 'required|integer|min:1',
+            'mark_package_as_popular' => 'required|boolean',
+        ]);
+    
+        // Update basic package details
+        $package->update($validatedData);
+    
+        // Update features if provided
+        if (isset($validatedData['features'])) {
+            $features = array_fill_keys($validatedData['features'], true);
+            $package->features = json_encode($features);
+        }
+    
+        // Save the updated package
+        $package->save();
+    
+        // Redirect to the package list with a success message
+        return redirect()->route('superadmin.packages')->with('success', 'Package updated successfully!');
     }
+
+
     // To delete a package at URL superadmin/packages/delete/{id}
     public function deletePackages($id)
     {
@@ -586,8 +748,6 @@ class SuperAdminController extends Controller
         try {
             // First create the Business (so we can get its ID)
             $business = Business::create($validatedBusinessData);
-    
-
     
             $owner = User::create([
                 'user_name' => $validatedUserData['user_name'],
@@ -943,9 +1103,26 @@ class SuperAdminController extends Controller
     // To delete a business at URL superadmin/businesses/delete/{id}
     public function deleteBusiness($id)
     {
-        $business = Business::findOrFail($id); // Retrieve the business by ID
-        $business->delete(); // Delete the business
-        return redirect()->route('superadmin.businesses')->with('success', 'Business deleted successfully');
+        try {
+                DB::beginTransaction(); // Start the transaction
+        
+                $business = Business::findOrFail($id);
+        
+                // Finally, delete the business
+                $business->delete();
+        
+                DB::commit(); // Commit the transaction if everything is successful
+        
+                return redirect()->route('superadmin.businesses')->with('success', 'Business and all related data deleted successfully');
+            } catch (\Exception $e) {
+                DB::rollBack(); // Rollback transaction in case of failure
+        
+                // Log the error for debugging
+                Log::error('Failed to delete business: ' . $e->getMessage());
+        
+                return redirect()->route('superadmin.businesses')->with('error', 'Failed to delete the business. Please try again later.');
+            }
+
     }
     
     public function showBusiness($id)

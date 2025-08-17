@@ -37,6 +37,7 @@
                              <th>Paid Via</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            <th>Expires In</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -52,6 +53,21 @@
                                  <td>{{ $subscription->paid_via ?? 'N/A' }}</td>
                                 <td>{{ $subscription->start_date }}</td>
                                 <td>{{ $subscription->end_date }}</td>
+                                <td>
+                                    @php
+                                        $today = \Carbon\Carbon::today();
+                                        $end = \Carbon\Carbon::parse($subscription->end_date);
+                                        $daysLeft = $today->diffInDays($end, false);
+                                    @endphp
+
+                                    @if($daysLeft > 0)
+                                        <span class="badge bg-info">{{ $daysLeft }} day{{ $daysLeft > 1 ? 's' : '' }} left</span>
+                                    @elseif($daysLeft === 0)
+                                        <span class="badge bg-warning">Expires Today</span>
+                                    @else
+                                        <span class="badge bg-danger">Expired {{ abs($daysLeft) }} day{{ abs($daysLeft) > 1 ? 's' : '' }} ago</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <span class="badge 
                                         {{ $subscription->status == 'approved' ? 'bg-success' : 
