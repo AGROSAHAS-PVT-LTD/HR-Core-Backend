@@ -159,7 +159,7 @@ class TaskSystemApiController extends Controller
   public function getTasks()
   {
     $tasks = Task::where('user_id', auth()->user()->id)
-      ->with('client')
+      ->with(['client', 'user'])
       ->get();
 
     $result = [];
@@ -185,6 +185,52 @@ class TaskSystemApiController extends Controller
           'latitude' => floatval($task->client->latitude),
           'longitude' => floatval($task->client->longitude),
         ] : null,
+        'userId' =>  $task->user->id,
+        'userName' => $task->user->getFullName(),
+        'description' => $task->description,
+        'isGeoFenceEnabled' => $task->is_geo_fence_enabled,
+        'latitude' => $task->latitude,
+        'longitude' => $task->longitude,
+        'maxRadius' => $task->max_radius,
+        'taskType' => $task->type,
+        'title' => $task->title,
+      ];
+    }
+
+    return Success::response($result);
+
+  }
+
+  public function getManagerTasks()
+  {
+    $tasks = Task::with(['client', 'user'])
+      ->get();
+
+    $result = [];
+
+    foreach ($tasks as $task) {
+
+      $date = Carbon::parse($task->for_date);
+
+      $result[] = [
+        'id' => $task->id,
+        'forDate' => $date->format('d-m-Y h:i A'),
+        'startDateTime' => Carbon::parse($task->start_date_time)->format('d-m-Y h:i A'),
+        'endDateTime' => Carbon::parse($task->end_date_time)->format('d-m-Y h:i A'),
+        'status' => $task->status == 'new' ? 'new' : ($task->status == 'in_progress' ? 'inprogress' : $task->status),
+        'assignedById' => $task->assigned_by_id,
+        'clientId' => $task->client_id,
+        'client' => $task->client != null ? [
+          'id' => $task->client->id,
+          'name' => $task->client->name,
+          'address' => $task->client->address,
+          'phoneNumber' => $task->client->phone,
+          'email' => $task->client->email,
+          'latitude' => floatval($task->client->latitude),
+          'longitude' => floatval($task->client->longitude),
+        ] : null,
+        'userId' =>  $task->user->id,
+        'userName' => $task->user->getFullName(),
         'description' => $task->description,
         'isGeoFenceEnabled' => $task->is_geo_fence_enabled,
         'latitude' => $task->latitude,
@@ -341,6 +387,75 @@ class TaskSystemApiController extends Controller
     $pushHelper->sendNotificationToAdmin('Task resumed', 'Task resumed by ' . $user->getFullName());
 
     return Success::response('Task resumed successfully');
+  }
+
+  public function getUserTasks(Request $request)
+  {
+    $userId = $request->user_id;
+    
+    if (!$userId) {
+      return Error::response('User ID is required');
+    }
+
+    $tasks = Task::where('user_id', $userId)
+      ->with(['client', 'user'])
+      ->get();
+
+    $result = [];
+
+    foreach ($tasks as $task) {
+      $date = Carbon::parse($task->for_date);
+
+      $result[] = [
+        'id' => $task->id,
+        'forDate' => $date->format('d-m-Y h:i A'),
+        'startDateTime' => Carbon::parse($task->start_date_time)->format('d-m-Y h:i A'),
+        'endDateTime' => Carbon::parse($task->end_date_time)->format('d-m-Y h:i A'),
+        'status' => $task->status == 'new' ? 'new' : ($task->status == 'in_progress' ? 'inprogress' : $task->status),
+        'assignedById' => $task->assigned_by_id,
+        'clientId' => $task->client_id,
+        'client' => $task->client != null ? [
+          'id' => $task->client->id,
+          'name' => $task->client->name,
+          'address' => $task->client->address,
+          'phoneNumber' => $task->client->phone,
+          'email' => $task->client->email,
+          'latitude' => floatval($task->client->latitude),
+          'longitude' => floatval($task->client->longitude),
+        ] : null,
+
+        'userId' =>  $task->user->id,
+        'userName' => $task->user->getFullName(),
+
+        'isGeoFenceEnabled' => $task->is_geo_fence_enabled,
+        'latitude' => $task->latitude,
+        'longitude' => $task->longitude,
+        'maxRadius' => $task->max_radius,
+        'taskType' => $task->type,
+        'title' => $task->title,
+      ];
+    }
+
+    return Success::response($result);
+  }
+
+  public function getGroupUsersWithTasks()
+  {
+    $usersWithTasks = \App\Models\User::whereHas('tasks')
+      ->select('id', 'first_name', 'last_name')
+      ->withCount('tasks')
+      ->get();
+
+    $result = [];
+    foreach ($usersWithTasks as $user) {
+      $result[] = [
+        'id' => $user->id,
+        'name' => $user->first_name . ' ' . $user->last_name,
+        'taskCount' => $user->tasks_count
+      ];
+    }
+
+    return Success::response($result);
   }
 
   public function completeTask(Request $request)

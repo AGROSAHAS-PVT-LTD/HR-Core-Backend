@@ -23,6 +23,9 @@ Route::middleware([
         'as' => 'api.',
       ], function ($router) {
         Route::get('task/GetAll', [TaskSystemApiController::class, 'getTasks'])->name('getAll');
+        Route::get('task/getManagerTasks', [TaskSystemApiController::class, 'getManagerTasks'])->name('getManagerTasks');
+        Route::get('task/groupUsers', [TaskSystemApiController::class, 'getGroupUsersWithTasks'])->name('groupUsers');
+        Route::get('task/user/{userId}', [TaskSystemApiController::class, 'getUserTasks'])->name('userTasks');
         Route::post('task/startTask', [TaskSystemApiController::class, 'startTask'])->name('startTask');
         Route::post('task/completeTask', [TaskSystemApiController::class, 'completeTask'])->name('completeTask');
         Route::post('task/holdTask', [TaskSystemApiController::class, 'holdTask'])->name('holdTask');
