@@ -8,6 +8,7 @@ use App\Models\UserDevice;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Laravel\Firebase\Facades\Firebase;
+use Illuminate\Support\Str;
 
 class PushHelper
 {
@@ -39,6 +40,7 @@ class PushHelper
   {
     try {
       Notification::create([
+        'id' => (string) Str::uuid(),
         'from_user_id' => $userId,
         'title' => $title,
         'description' => $message,
@@ -67,6 +69,7 @@ class PushHelper
   {
     try {
       Notification::create([
+        'id' => (string) Str::uuid(),
         'title' => $title,
         'description' => $message,
         'type' => 'admin',
@@ -103,6 +106,7 @@ class PushHelper
       $title = 'New Message from ' . $fromUser->first_name . ' ' . $fromUser->last_name;
 
       Notification::create([
+        'id' => (string) Str::uuid(),
         'from_user_id' => $fromUserId,
         'to_user_id' => $toUserId,
         'title' => $title,
@@ -134,6 +138,7 @@ class PushHelper
       $title = 'New Message from ' . $fromUser->getFullName();
 
       Notification::create([
+        'id' => (string) Str::uuid(),
         'from_user_id' => $fromUserId,
         'title' => $title,
         'description' => $message,

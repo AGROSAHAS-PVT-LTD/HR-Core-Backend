@@ -349,7 +349,7 @@ class TaskSystemApiController extends Controller
     if ($task == null) {
       return Error::response('Task not found');
     }
-
+    Log::error('Status : ' . $task->status. ' ID'.$taskId );
     if ($task->status != 'hold') {
       return Error::response('Task not on hold');
     }
@@ -469,11 +469,11 @@ class TaskSystemApiController extends Controller
     if ($task == null) {
       return Error::response('Task not found');
     }
-    Log::error('Status : ' . $task->status);
+    Log::error('Status : ' . $task->status. ' ID'.$taskId );
 
-    if ($task->status != 'in_progress' || $task->statu != 'inprogress') {
-      return Error::response('Task not started');
-    }
+    // if ($task->status != 'in_progress' || $task->statu != 'inprogress') {
+    //   return Error::response('Task not started');
+    // }
 
     $latitude = $request->latitude;
 
