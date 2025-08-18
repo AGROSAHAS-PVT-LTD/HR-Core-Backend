@@ -45,7 +45,7 @@ Route::middleware('api')->group(function () {
     // Manager App
     Route::group(['prefix' => 'manager/'], function () {
        Route::post('loginWithEmailAddress', [ManagerApiController::class, 'loginWithEmailAddress'])->name('loginWithEmailAddress');
-       Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
+       Route::get('getUnAuthPackages', [ManagerApiController::class, 'getUnAuthPackages'])->name('manager.unpackages');
     });
    
 
@@ -186,7 +186,7 @@ Route::middleware('auth:api')->group(function () {
       Route::group(['prefix' => 'manager'], function () {
 
 
-        // Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
+        Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
         Route::get('getDashboardData', [ManagerApiController::class, 'getDashboard'])->name('manager.dashboard');
         Route::get('getEmployeesStatus', [ManagerApiController::class, 'getEmployeesStatus'])->name('manager.employees.status');
         Route::get('getAllLeaveRequests', [ManagerApiController::class, 'getAllLeaveRequests'])->name('manager.leave.requests');

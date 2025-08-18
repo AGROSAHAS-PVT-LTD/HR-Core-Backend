@@ -184,6 +184,19 @@ class ManagerApiController extends Controller
             'packages' => $packages,
         ]);
     }
+
+    public function getUnAuthPackages()
+    {
+    
+        // Fetch active packages
+        $packages = Package::where('is_active', true)->get();
+        return response()->json([
+            'statusCode' => 200,
+            'status' => 'success',
+            'data' => null,
+            'packages' => $packages,
+        ]);
+    }
     
     public function getUserData()
     {
