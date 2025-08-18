@@ -109,6 +109,19 @@ class ManagerApiController extends Controller
             return response()->json(['error' => 'could_not_create_token error => ' . $e->getMessage()], 500);
         }
 
+        $currentSubscription = null;
+        
+        if($user){
+            // Fetch current subscription
+            $currentSubscription = Subscription::where('business_id', $user->business_id )
+            ->where(function ($query) {
+                $query->where('status', 'approved')
+                      ->orWhere('end_date', '>=', now());
+            })
+            ->latest('end_date')
+            ->first();
+        }
+
         $response = [
             'token' => $token,
             'id' => $user->id,
@@ -120,6 +133,7 @@ class ManagerApiController extends Controller
             'Gender' => 'male',
             'Avatar' => $user->profile_picture ?? '',
             'status' => $user->status,
+            'subscription_status' => $currentSubscription->isActive(),
         ];
         return response()->json([
             'statusCode' => 200,

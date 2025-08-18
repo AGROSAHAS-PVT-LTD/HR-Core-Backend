@@ -12,6 +12,7 @@ use App\Models\Shift;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\UserDevice;
+use App\Models\Subscription;
 use App\Services\UserService\IUserService;
 use Carbon\Carbon;
 use Constants;
@@ -72,6 +73,18 @@ class AuthController extends Controller
       if ($token == '') {
         return Error::response('Could not generate token, authentication failed');
       }
+      $currentSubscription = null;
+        
+      if($user){
+        // Fetch current subscription
+        $currentSubscription = Subscription::where('business_id', $user->business_id )
+          ->where(function ($query) {
+              $query->where('status', 'approved')
+                    ->orWhere('end_date', '>=', now());
+          })
+          ->latest('end_date')
+          ->first();
+      }
 
       $response = [
         'id' => $user->id,
@@ -89,7 +102,9 @@ class AuthController extends Controller
         'createdAt' => $user->created_at->format(Constants::DateTimeFormat),
         'avatar' => $user->profile_picture ? asset(Constants::BaseFolderEmployeeProfileWithSlash . $user->profile_picture) : null,
         'token' => $token,
-        'expiresIn' => JWTAuth::factory()->getTTL()
+        'expiresIn' => JWTAuth::factory()->getTTL(),
+        'subscription_status' => $currentSubscription->isActive(),
+
       ];
 
       return Success::response($response);
@@ -100,6 +115,8 @@ class AuthController extends Controller
     }
 
   }
+
+
 
   private function generateToken($credentials)
   {
