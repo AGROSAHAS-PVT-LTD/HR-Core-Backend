@@ -42,6 +42,7 @@ Route::middleware('api')->group(function () {
       return response()->json(['message' => 'Hello World!']);
     });
 
+    Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
 
     //Settings
     Route::group(['prefix' => 'settings/'], function () {
@@ -180,7 +181,7 @@ Route::middleware('auth:api')->group(function () {
       Route::group(['prefix' => 'manager'], function () {
 
         Route::post('loginWithEmailAddress', [ManagerApiController::class, 'loginWithEmailAddress'])->name('loginWithEmailAddress');
-        Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
+        // Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
         Route::get('getDashboardData', [ManagerApiController::class, 'getDashboard'])->name('manager.dashboard');
         Route::get('getEmployeesStatus', [ManagerApiController::class, 'getEmployeesStatus'])->name('manager.employees.status');
         Route::get('getAllLeaveRequests', [ManagerApiController::class, 'getAllLeaveRequests'])->name('manager.leave.requests');
