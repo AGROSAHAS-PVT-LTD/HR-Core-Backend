@@ -63,7 +63,6 @@ class ManagerApiController extends Controller
         
         if (isset($request['isManager']) && $request->input('isManager')) {
             // If isManager is true, check for Admin role
-            Log::error('User Role : ' . $userRole->name);
             if ($userRole == null || $userRole->name != 'admin') {
                 return response()->json([
                 'statusCode' => 506,

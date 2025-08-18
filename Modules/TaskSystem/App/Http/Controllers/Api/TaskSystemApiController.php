@@ -13,6 +13,8 @@ use Constants;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use function DateTime;
+use Illuminate\Support\Facades\Log;
+
 
 class TaskSystemApiController extends Controller
 {
@@ -26,7 +28,7 @@ class TaskSystemApiController extends Controller
       return Error::response('Task not found');
     }
 
-    if ($task->status != 'in_progress') {
+    if ($task->status != 'in_progress' || $task->status != 'inprogress') {
       return Error::response('Task not started');
     }
 
@@ -78,7 +80,7 @@ class TaskSystemApiController extends Controller
       return Error::response('Task not found');
     }
 
-    if ($task->status != 'in_progress') {
+    if ($task->status != 'in_progress' || $task->status != 'inprogress') {
       return Error::response('Task not started');
     }
 
@@ -306,7 +308,7 @@ class TaskSystemApiController extends Controller
       return Error::response('Task not found');
     }
 
-    if ($task->status != 'in_progress') {
+    if ($task->status != 'in_progress' || $task->status != 'inprogress') {
       return Error::response('Task already started');
     }
 
@@ -467,8 +469,9 @@ class TaskSystemApiController extends Controller
     if ($task == null) {
       return Error::response('Task not found');
     }
+    Log::error('Status : ' . $task->status);
 
-    if ($task->status != 'in_progress') {
+    if ($task->status != 'in_progress' || $task->statu != 'inprogress') {
       return Error::response('Task not started');
     }
 
