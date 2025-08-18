@@ -319,7 +319,7 @@ class ManagerApiController extends Controller
             'user_name' => 'nullable|string|max:255|unique:users,user_name',
             'email' => 'required|email|unique:users,email',
             'gender' => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
+            // 'designation' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20|unique:users,phone',
             'password' => 'required|string|min:6'
         ]);
@@ -365,15 +365,13 @@ class ManagerApiController extends Controller
             $createdUser->save();
     
             // Attach role to the new user
-            $userRole = Sentinel::findRoleBySlug('user');
-            if ($userRole) {
-                $userRole->users()->attach($createdUser);
-            }
+            $user->assignRole('field_employee');
+
     
             $businessId = $createdUser->business_id;
     
-            // Create Default Team if not exists
-           $team = Team::firstOrCreate(
+                // Create Default Team if not exists
+            $team = Team::firstOrCreate(
                 ['name' => 'Default Team', 'business_id' => $businessId],
                 [
                     'description' => 'This is the default team.',
@@ -675,7 +673,7 @@ class ManagerApiController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $request->user_id,
             'gender' => 'required|string|in:male,female,other',
-            'designation' => 'required|string|max:255',
+            // 'designation' => 'required|string|max:255',
             'status' => 'required|string|max:25',
             'phone_number' => 'required|string|max:20|unique:users,phone,' . $request->user_id,
             'password' => 'nullable|string|min:6'
@@ -692,15 +690,15 @@ class ManagerApiController extends Controller
             $user->email = $validatedUserData['email'];
             $user->status = $validatedUserData['status'];
             $user->gender = $validatedUserData['gender'];
-            $user->designation = $validatedUserData['designation'];
+            // $user->designation = $validatedUserData['designation'];
             $user->phone = $validatedUserData['phone_number'];
-    
+            
+
             if (!empty($validatedUserData['password'])){
                 $user->password = bcrypt($validatedUserData['password']);
             }
-
             $user->save();
-    
+            
             return Success::response('User account updated successfully');
     
         } catch (\Exception $e) {
