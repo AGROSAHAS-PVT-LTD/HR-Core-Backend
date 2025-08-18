@@ -22,7 +22,7 @@ use App\Models\Client;
 use App\Models\Team;
 use Carbon\Carbon;
 use Constants;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Cartalyst\Sentinel\Laravel\Facades\Sentinel;
@@ -116,7 +116,7 @@ class ManagerApiController extends Controller
             'lastName' => $user->last_name,
             'emailId' => $user->email,
             'employeeId' => $user->user_name,
-            'phoneNumber' => $user->phone_number,
+            'phoneNumber' => $user->phone,
             'Gender' => 'male',
             'Avatar' => $user->profile_picture ?? '',
             'status' => $user->status,
