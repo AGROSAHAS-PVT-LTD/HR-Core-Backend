@@ -431,9 +431,19 @@ class EmployeeController extends Controller
     $inactive = User::where('status', UserAccountStatus::INACTIVE) ->where('business_id', auth()->user()->business_id)->count();
     $relieved = User::where('status', UserAccountStatus::RELIEVED) ->where('business_id', auth()->user()->business_id)->count();
 
-    $roles = Role::select('id', 'name')->whereNull('business_id')
-    ->orWhere('business_id', auth()->user()->business_id)
-      ->get();
+    // $roles = Role::select('id', 'name')->whereNull('business_id')
+    // ->orWhere('business_id', auth()->user()->business_id)
+    //   ->get();
+
+    $roles = Role::where(function($query) use ($businessId) {
+              $query->whereNull('business_id')
+                    ->orWhere('business_id', $businessId);
+          })
+          ->with(['users' => function ($query) use ($businessId) {
+              $query->where('business_id', $businessId);
+          }])
+          ->get();  
+
 
     $teams = Team::where('status', Status::ACTIVE)
       ->select('id', 'name', 'code')
