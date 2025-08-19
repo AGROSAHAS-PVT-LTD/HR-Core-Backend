@@ -19,16 +19,12 @@ class CheckSubscription
         
         // Check if the user is a super-admin
         if ($user->is_superuser) {
-            Log::info('Super-admin detected', ['user_id' => $user->id]);
             return $next($request);
         }
-        Log::info('User detected', ['user_id' => $user->id]);
-
         // Check if the user has a business
         $business = Business::find($user->business_id);
         
         if (!$business) {
-            Log::info('Super-admin detected', ['user_id' => $user->id]);
             return abort(403, 'No business associated with this user.');
         }
         

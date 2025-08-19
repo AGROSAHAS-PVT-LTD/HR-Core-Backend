@@ -307,9 +307,13 @@ class TaskSystemApiController extends Controller
     if ($task == null) {
       return Error::response('Task not found');
     }
+    Log::error('Status : ' . $task->status. ' ID'.$taskId );
 
-    if ($task->status != 'in_progress' || $task->status != 'inprogress') {
-      return Error::response('Task already started');
+    if ($task->status == 'completed') {
+    // if ($task->status != 'in_progress' || $task->status != 'inprogress') {  
+      // return Error::response('Task already started'); 
+      return Error::response('Task was already Completed');
+
     }
 
     $latitude = $request->latitude;

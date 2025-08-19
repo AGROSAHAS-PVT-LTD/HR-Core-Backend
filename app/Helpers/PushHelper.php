@@ -68,13 +68,13 @@ class PushHelper
   function sendNotificationToAdmin($title, $message)
   {
     try {
-      Notification::create([
-        'id' => (string) Str::uuid(),
-        'title' => $title,
-        'description' => $message,
-        'type' => 'admin',
-        'created_by_id' => 1
-      ]);
+      // Notification::create([
+      //   'id' => (string) Str::uuid(),
+      //   'title' => $title,
+      //   'description' => $message,
+      //   'type' => 'admin',
+      //   'created_by_id' => 1
+      // ]);
 
       $adminUsers = User::where('shift_id', '==', null)->get();
 
