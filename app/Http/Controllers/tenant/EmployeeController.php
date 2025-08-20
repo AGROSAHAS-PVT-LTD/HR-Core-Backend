@@ -434,7 +434,7 @@ class EmployeeController extends Controller
     // $roles = Role::select('id', 'name')->whereNull('business_id')
     // ->orWhere('business_id', auth()->user()->business_id)
     //   ->get();
-
+    $businessId = auth()->user()->business_id;
     $roles = Role::where(function($query) use ($businessId) {
               $query->whereNull('business_id')
                     ->orWhere('business_id', $businessId);
