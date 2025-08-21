@@ -559,8 +559,8 @@ class TaskSystemApiController extends Controller
             $task->for_date = $request->ForDate;
             $task->business_id = auth()->user()->business_id;
             $task->status = 'new';
-            $task->latitude = $request->Latitude;
-            $task->longitude = $request->Longitude;
+            $task->latitude =0.0;
+            $task->longitude = 0.0;
             $task->max_radius = 20;
             $task->save();
     
@@ -627,9 +627,9 @@ class TaskSystemApiController extends Controller
             $task->client_id = $request->TaskType == '1' ? $request->ClientId : null;
             $task->for_date = $request->ForDate;
             $task->status = 'new';
-            $task->latitude = $request->Latitude;
-            $task->longitude = $request->Longitude;
-            $task->max_radius = $request->MaxRadius;
+            $task->latitude =  0.0;
+            $task->longitude = 0.0;
+            $task->max_radius = 20;
             $task->save();
     
             return response()->json([

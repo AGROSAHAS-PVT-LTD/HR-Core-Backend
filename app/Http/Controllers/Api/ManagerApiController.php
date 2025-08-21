@@ -260,7 +260,7 @@ class ManagerApiController extends Controller
             // Update additional user details
             $createdUser->business_id = $businessPrefix;
             $createdUser->phone = $validatedUserData['phone_number'];
-            $createdUser->designation = $validatedUserData['designation'];
+            // $createdUser->designation = $validatedUserData['designation'];
             $createdUser->gender = $validatedUserData['gender'];
             $createdUser->status = 'active';
             $createdUser->user_name = $businessPrefix . '_' . $validatedUserData['user_name'];
@@ -322,8 +322,13 @@ class ManagerApiController extends Controller
                 $validatedUserData['password'],
                 $businessName
             ));
-    
-            return Success::response('User account created successfully');
+             return response()->json([
+                'statusCode' => 201,
+                'status' => 'success',
+                'message' => 'User account created successfully',
+                'task' => $task,
+            ], 201);
+            // return Success::response('User account created successfully');
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollBack();
@@ -482,8 +487,13 @@ class ManagerApiController extends Controller
                 $user->password = bcrypt($validatedUserData['password']);
             }
             $user->save();
-            
-            return Success::response('User account updated successfully');
+            return response()->json([
+                'statusCode' => 201,
+                'status' => 'success',
+                'message' => 'User account updated successfully',
+                'task' => $task,
+            ], 201);
+            // return Success::response('User account updated successfully');
     
         } catch (\Exception $e) {
             return Error::response('Failed to update user data '. $e);
