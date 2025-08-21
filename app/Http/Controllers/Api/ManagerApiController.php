@@ -228,7 +228,11 @@ class ManagerApiController extends Controller
     
         // Handle validation failure
         if ($validator->fails()) {
-            return Error::response($validator->messages());
+            return response()->json([
+                'statusCode' => 422,
+                'status'     => 'error',
+                'errors'     => $validator->errors(),
+            ], 422);
         }
        
         // Get authenticated user
@@ -254,13 +258,13 @@ class ManagerApiController extends Controller
                 'first_name' => $validatedUserData['first_name'],
                 'last_name'  => $validatedUserData['last_name'],
                 'email'      => $validatedUserData['email'],
-                'user_name'  => $business->id . '_' . Str::slug($validatedUserData['first_name'].$validatedUserData['last_name']),
+                'user_name'  => $businessPrefix . '_' . Str::slug($validatedUserData['first_name'].$validatedUserData['last_name']),
                 'phone'      => $validatedUserData['phone_number'],
                 'phone_verified_at' => now(),
                 'password'   => bcrypt($validated['password']),
                 'email_verified_at' => now(),
                 'code'       => 'GPS' . rand(100000, 999999),
-                'business_id'=> $business->id,
+                'business_id'=> $businessPrefix,
             ]);
 
 
@@ -330,7 +334,6 @@ class ManagerApiController extends Controller
                 'statusCode' => 201,
                 'status' => 'success',
                 'message' => 'User account created successfully',
-                'task' => $task,
             ], 201);
             // return Success::response('User account created successfully');
         } catch (\Exception $e) {
@@ -446,7 +449,7 @@ class ManagerApiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
 
             return response()->json([
                 'statusCode' => 500,
@@ -495,7 +498,6 @@ class ManagerApiController extends Controller
                 'statusCode' => 201,
                 'status' => 'success',
                 'message' => 'User account updated successfully',
-                'task' => $task,
             ], 201);
             // return Success::response('User account updated successfully');
     
@@ -705,7 +707,7 @@ class ManagerApiController extends Controller
             ]);
         } catch (\Exception $e) {
             // Log the exception and return an error response
-            \Log::error('Error in getEmployeesStatus: ' . $e->getMessage());
+            Log::error('Error in getEmployeesStatus: ' . $e->getMessage());
     
             return response()->json([
                 'statusCode' => 500,
@@ -714,7 +716,6 @@ class ManagerApiController extends Controller
             ]);
         }
     }
-
 
     public function getAllLeaveRequests()
     {
