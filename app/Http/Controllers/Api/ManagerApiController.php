@@ -248,19 +248,23 @@ class ManagerApiController extends Controller
         try {
             // Start Transaction
             DB::beginTransaction();
-    
-            // Register and activate the new user
-            $createdUser = Sentinel::registerAndActivate([
+                
+            // 2. Create Owner User
+            $createdUser = User::create([
                 'first_name' => $validatedUserData['first_name'],
-                'last_name' => $validatedUserData['last_name'],
-                'email' => $validatedUserData['email'],
-                'password' => $validatedUserData['password'],
+                'last_name'  => $validatedUserData['last_name'],
+                'email'      => $validatedUserData['email'],
+                'user_name'  => $business->id . '_' . Str::slug($validatedUserData['first_name'].$validatedUserData['last_name']),
+                'phone'      => $validatedUserData['phone_number'],
+                'phone_verified_at' => now(),
+                'password'   => bcrypt($validated['password']),
+                'email_verified_at' => now(),
+                'code'       => 'GPS' . rand(100000, 999999),
+                'business_id'=> $business->id,
             ]);
-    
+
+
             // Update additional user details
-            $createdUser->business_id = $businessPrefix;
-            $createdUser->phone = $validatedUserData['phone_number'];
-            // $createdUser->designation = $validatedUserData['designation'];
             $createdUser->gender = $validatedUserData['gender'];
             $createdUser->status = 'active';
             $createdUser->user_name = $businessPrefix . '_' . $validatedUserData['user_name'];
@@ -334,7 +338,7 @@ class ManagerApiController extends Controller
             DB::rollBack();
     
             // Enhanced Logging
-            \Log::error('User creation failed: ' . $e->getMessage(), [
+            Log::error('User creation failed: ' . $e->getMessage(), [
                 'user_email' => $validatedUserData['email'],
                 'business_id' => $user->business_id ?? null,
                 'trace' => $e->getTraceAsString()
@@ -497,7 +501,7 @@ class ManagerApiController extends Controller
     
         } catch (\Exception $e) {
 
-            \Log::error('User Update failed: ' . $e->getMessage());
+            Log::error('User Update failed: ' . $e->getMessage());
             return response()->json([
                 'statusCode' => 400,
                 'status' => 'error',
