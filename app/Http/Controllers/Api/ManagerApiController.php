@@ -496,7 +496,14 @@ class ManagerApiController extends Controller
             // return Success::response('User account updated successfully');
     
         } catch (\Exception $e) {
-            return Error::response('Failed to update user data '. $e);
+
+            \Log::error('User Update failed: ' . $e->getMessage());
+            return response()->json([
+                'statusCode' => 400,
+                'status' => 'error',
+                'message' => 'Failed to update user data.',
+            ], 400);
+
         }
     }
     
