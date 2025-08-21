@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use function DateTime;
 use Illuminate\Support\Facades\Log;
+use Exception;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -571,7 +572,7 @@ class TaskSystemApiController extends Controller
                 'message' => 'Task created successfully',
             ], 201);
         } catch (\Exception $e) {
-            \Log::error('Task creation failed: ' . $e->getMessage());
+            Log::error('Task creation failed: ' . $e->getMessage());
     
             return response()->json([
                 'statusCode' => 500,
@@ -580,16 +581,13 @@ class TaskSystemApiController extends Controller
             ], 500);
         }
   }
-  
+
   public function addEmployeeTask(Request $request)
   {
         // Validate the request
         $validator = Validator::make($request->all(), [
             'TaskType' => 'required|in:1,2',
             'ClientId' => 'required_if:TaskType,1|nullable|exists:clients,id',
-            // 'Latitude' => 'required|numeric',
-            // 'Longitude' => 'required|numeric',
-            // 'MaxRadius' => 'required|numeric',
             'Title' => 'required|string|max:255',
             'Description' => 'required|string',
             'ForDate' => 'required|date',
@@ -641,8 +639,7 @@ class TaskSystemApiController extends Controller
                 'task' => $task,
             ], 201);
         } catch (\Exception $e) {
-            \Log::error('Employee task creation failed: ' . $e->getMessage());
-    
+            Log::error('Employee task creation failed: ' . $e->getMessage());
             return response()->json([
                 'statusCode' => 500,
                 'status' => 'error',
