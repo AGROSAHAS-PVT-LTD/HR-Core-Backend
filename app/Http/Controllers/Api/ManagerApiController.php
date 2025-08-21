@@ -248,7 +248,6 @@ class ManagerApiController extends Controller
         // Prepare validated data
         $validatedUserData = $validator->validated();
         $businessPrefix = $user->business_id ?? '0';
-    
         try {
             // Start Transaction
             DB::beginTransaction();
@@ -261,7 +260,7 @@ class ManagerApiController extends Controller
                 'user_name'  => $businessPrefix . '_' . Str::slug($validatedUserData['first_name'].$validatedUserData['last_name']),
                 'phone'      => $validatedUserData['phone_number'],
                 'phone_verified_at' => now(),
-                'password'   => bcrypt($validated['password']),
+                'password'   => bcrypt($validatedUserData['password']),
                 'email_verified_at' => now(),
                 'code'       => 'GPS' . rand(100000, 999999),
                 'business_id'=> $businessPrefix,
