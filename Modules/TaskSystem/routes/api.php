@@ -22,6 +22,10 @@ Route::middleware([
         'middleware' => 'api',
         'as' => 'api.',
       ], function ($router) {
+
+        Route::post('task/addEmployeeTask', [TaskSystemApiController::class, 'addEmployeeTask'])->name('addEmployeeTask');
+        Route::post('task/addTask', [TaskSystemApiController::class, 'addTask'])->name('addTask');
+
         Route::get('task/GetAll', [TaskSystemApiController::class, 'getTasks'])->name('getAll');
         Route::get('task/getManagerTasks', [TaskSystemApiController::class, 'getManagerTasks'])->name('getManagerTasks');
         Route::get('task/groupUsers', [TaskSystemApiController::class, 'getGroupUsersWithTasks'])->name('groupUsers');

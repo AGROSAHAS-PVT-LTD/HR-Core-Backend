@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use function DateTime;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+
 
 
 class TaskSystemApiController extends Controller
@@ -506,5 +508,146 @@ class TaskSystemApiController extends Controller
     $pushHelper->sendNotificationToAdmin('Task completed', 'Task completed by ' . $user->getFullName());
 
     return Success::response('Task completed successfully');
+  }
+
+  public function addTask(Request $request)
+  {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'TaskType' => 'required|in:1,2',
+            'EmployeeId' => 'required|exists:users,id',
+            'ClientId' => 'required_if:TaskType,1|nullable|exists:clients,id',
+            'Latitude' => 'nullable|numeric',
+            'Longitude' => 'nullable|numeric',
+            'MaxRadius' => 'nullable|numeric',
+            'Title' => 'required|string|max:255',
+            'Description' => 'required|string',
+            'ForDate' => 'required|date',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'statusCode' => 422,
+                'status' => 'error',
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+    
+        // Check if a similar task exists
+        $taskExists = Task::where('user_id', $request->EmployeeId)
+            ->where('for_date', $request->ForDate)
+            ->where('status', 'new')
+            ->first();
+    
+        if ($taskExists) {
+            return response()->json([
+                'statusCode' => 409,
+                'status' => 'error',
+                'message' => 'Task already exists for the employee on this date.',
+            ], 409);
+        }
+    
+        try {
+            $task = new Task();
+            $task->title = $request->Title;
+            $task->description = $request->Description;
+            $task->type = $request->TaskType == '1' ? 'client_based' : 'open';
+            $task->assigned_by_id = auth()->id();
+            $task->user_id = $request->EmployeeId;
+            $task->client_id = $request->TaskType == '1' ? $request->ClientId : null;
+            $task->for_date = $request->ForDate;
+            $task->business_id = auth()->user()->business_id;
+            $task->status = 'new';
+            $task->latitude = $request->Latitude;
+            $task->longitude = $request->Longitude;
+            $task->max_radius = 20;
+            $task->save();
+    
+            // Send notification
+            $this->sendFcmNotificationUserToken($task->user_id, $request->Description, $request->Title);
+            return response()->json([
+                'statusCode' => 201,
+                'status' => 'success',
+                'message' => 'Task created successfully',
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Task creation failed: ' . $e->getMessage());
+    
+            return response()->json([
+                'statusCode' => 500,
+                'status' => 'error',
+                'message' => 'Failed to create task. Please try again later.',
+            ], 500);
+        }
+  }
+  
+  public function addEmployeeTask(Request $request)
+  {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'TaskType' => 'required|in:1,2',
+            'ClientId' => 'required_if:TaskType,1|nullable|exists:clients,id',
+            // 'Latitude' => 'required|numeric',
+            // 'Longitude' => 'required|numeric',
+            // 'MaxRadius' => 'required|numeric',
+            'Title' => 'required|string|max:255',
+            'Description' => 'required|string',
+            'ForDate' => 'required|date',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'statusCode' => 422,
+                'status' => 'error',
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+    
+        $employeeId = auth()->id(); // Get authenticated user's ID
+    
+        // Check if a similar task exists
+        $taskExists = Task::where('user_id', $employeeId)
+            ->where('for_date', $request->ForDate)
+            ->where('status', 'new')
+            ->first();
+    
+        if ($taskExists) {
+            return response()->json([
+                'statusCode' => 409,
+                'status' => 'error',
+                'message' => 'You already have a task scheduled for this date.',
+            ], 409);
+        }
+    
+        try {
+            $task = new Task();
+            $task->title = $request->Title;
+            $task->description = $request->Description;
+            $task->type = $request->TaskType == '1' ? 'client_based' : 'open';
+            $task->assigned_by_id = $employeeId; // Employee assigns task to themselves
+            $task->user_id = $employeeId;
+            $task->client_id = $request->TaskType == '1' ? $request->ClientId : null;
+            $task->for_date = $request->ForDate;
+            $task->status = 'new';
+            $task->latitude = $request->Latitude;
+            $task->longitude = $request->Longitude;
+            $task->max_radius = $request->MaxRadius;
+            $task->save();
+    
+            return response()->json([
+                'statusCode' => 201,
+                'status' => 'success',
+                'message' => 'Task created successfully',
+                'task' => $task,
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Employee task creation failed: ' . $e->getMessage());
+    
+            return response()->json([
+                'statusCode' => 500,
+                'status' => 'error',
+                'message' => 'Failed to create task. Please try again later.',
+            ], 500);
+        }
   }
 }

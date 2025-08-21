@@ -194,10 +194,10 @@ Route::middleware('auth:api')->group(function () {
         // Route::get('getAllExpenseRequests', [ManagerApiController::class, 'getAllExpenseRequests'])->name('manager.expense.requests');
         // Route::post('changeExpenseStatus', [ManagerApiController::class, 'changeExpenseStatus'])->name('manager.expense.change.status');
             
-        // Route::get('getUserData', [ManagerApiController::class, 'getUserData'])->name('manager.users.data');
-        // Route::post('addNewUserData', [ManagerApiController::class, 'addNewUserData'])->name('manager.user.add');
-        // Route::post('editUserData', [ManagerApiController::class, 'editUserData'])->name('manager.user.edit');
-        // Route::post('addNewAccountData', [ManagerApiController::class, 'addNewAccountData'])->name('manager.useraccount.edit');
+        Route::get('getUserData', [ManagerApiController::class, 'getUserData'])->name('manager.users.data');
+        Route::post('addNewUserData', [ManagerApiController::class, 'addNewUserData'])->name('manager.user.add');
+        Route::post('editUserData', [ManagerApiController::class, 'editUserData'])->name('manager.user.edit');
+        Route::post('addNewAccountData', [ManagerApiController::class, 'addNewAccountData'])->name('manager.useraccount.edit');
             
         Route::get('getTaskDetails', [ManagerApiController::class, 'getTaskDetails'])->name('manager.task.data');
 
