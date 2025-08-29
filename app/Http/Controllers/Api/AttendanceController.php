@@ -335,7 +335,7 @@ class AttendanceController extends Controller
       'accuracy' => 100,
       'bearing' => $request->bearing,
       'horizontalAccuracy' => $request->horizontalAccuracy,
-      'altitude' => $request->altitude,
+      'altitude' => $request->altitude ?? 0,
       'verticalAccuracy' => $request->verticalAccuracy,
       'course' => $request->course,
       'courseAccuracy' => $request->courseAccuracy,
