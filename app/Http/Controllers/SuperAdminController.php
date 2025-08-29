@@ -21,7 +21,49 @@ use Carbon\Carbon;
 
 class SuperAdminController extends Controller
 {
-        
+       
+    public function updateMapSettings(Request $request)
+    {
+        if (env('APP_DEMO')) {
+        return redirect()->back()->with('error', 'This feature is disabled in the demo.');
+        }
+
+        $request->validate([
+        'mapProvider' => 'required',
+        'mapApiKey' => 'required',
+        'mapZoomLevel' => 'required',
+        'centerLatitude' => 'required',
+        'centerLongitude' => 'required',
+        ]);
+
+        $settings = Settings::first();
+
+        if ($settings->map_provider != $request->mapProvider) {
+        $settings->map_provider = $request->mapProvider;
+        }
+
+        if ($settings->map_api_key != $request->mapApiKey) {
+        $settings->map_api_key = $request->mapApiKey;
+        }
+
+        if ($settings->map_zoom_level != $request->mapZoomLevel) {
+        $settings->map_zoom_level = $request->mapZoomLevel;
+        }
+
+        if ($settings->center_latitude != $request->centerLatitude) {
+        $settings->center_latitude = $request->centerLatitude;
+        }
+
+        if ($settings->center_longitude != $request->centerLongitude) {
+        $settings->center_longitude = $request->centerLongitude;
+        }
+
+        $settings->save();
+
+        return redirect()->back()->with('success', 'Settings updated successfully');
+
+    }
+
     public function defaultHome(Request $request)
     {
         $packages = Package::latest()->paginate(10);
