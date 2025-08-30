@@ -453,7 +453,7 @@ class ManagerApiController extends Controller
             return response()->json([
                 'statusCode' => 500,
                 'status' => 'error',
-                'message' => 'Failed to create business and owner. '.$e->getMessage(),
+                'message' => 'Failed to create business and owner. ',
             ], 500);
         }
     }

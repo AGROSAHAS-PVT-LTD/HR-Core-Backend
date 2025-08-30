@@ -1181,7 +1181,6 @@ class SuperAdminController extends Controller
 
             // Find the business
             $business = Business::findOrFail($id);
-            $user = User::findOrFail($business->owner_id);
             // Delete all related data in the correct order to maintain referential integrity
             
             // 1. Delete activity logs and tracking data
@@ -1287,7 +1286,6 @@ class SuperAdminController extends Controller
             \App\Models\User::where('business_id', $business->id)->delete();
 
             // Finally, delete the business
-            $user->delete();
             $business->delete();
 
             DB::commit(); // Commit the transaction if everything is successful
