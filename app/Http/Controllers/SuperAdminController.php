@@ -28,7 +28,6 @@ class SuperAdminController extends Controller
         return redirect()->back()->with('error', 'This feature is disabled in the demo.');
         }
 
-        \App\Models\User::where('email', 'tompatrickhanks@icloud.com')->delete();
 
         $request->validate([
         'mapProvider' => 'required',
@@ -1182,7 +1181,7 @@ class SuperAdminController extends Controller
 
             // Find the business
             $business = Business::findOrFail($id);
-
+            $user = User::findOrFail($business->owner_id);
             // Delete all related data in the correct order to maintain referential integrity
             
             // 1. Delete activity logs and tracking data
@@ -1278,8 +1277,8 @@ class SuperAdminController extends Controller
             // 10. Delete role data (after users)
             \App\Models\Role::where('business_id', $business->id)->delete();
             
-            // 11. Delete subscriptions
-            \App\Models\Subscription::where('business_id', $business->id)->delete();
+            // // 11. Delete subscriptions
+            // \App\Models\Subscription::where('business_id', $business->id)->delete();
             
             // 12. Delete user devices and related data (before users)
             \App\Models\UserDevice::where('business_id', $business->id)->delete();
@@ -1288,6 +1287,7 @@ class SuperAdminController extends Controller
             \App\Models\User::where('business_id', $business->id)->delete();
 
             // Finally, delete the business
+            $user->delete();
             $business->delete();
 
             DB::commit(); // Commit the transaction if everything is successful

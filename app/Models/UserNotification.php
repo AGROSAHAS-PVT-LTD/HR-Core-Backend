@@ -21,7 +21,7 @@ class UserNotification extends Model implements AuditableContract
     'deleted_at',
     'created_by_id',
     'updated_by_id',
- 'business_id'
+    'business_id'
   ];
   public function business()
   {
