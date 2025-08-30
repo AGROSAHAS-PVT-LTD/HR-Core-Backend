@@ -1142,15 +1142,22 @@ class SuperAdminController extends Controller
     }
 
     // To delete a business at URL superadmin/businesses/delete/{id}
-    public function deleteBusiness($id)
+    public function deleteBusinessOld($id)
     {
         try {
                 DB::beginTransaction(); // Start the transaction
         
                 $business = Business::findOrFail($id);
-        
+                $latestSubscription = Subscription::where('business_id', $businessId)
+                ->where('status', 'approved') // Only consider approved subscriptions
+                ->orderBy('end_date', 'desc')
+                ->first();
+                $latestSubscription->delete();
+
+                $user = User::findOrFail('business_id',$id);
                 // Finally, delete the business
                 $business->delete();
+                $user->delete();
         
                 DB::commit(); // Commit the transaction if everything is successful
         
@@ -1165,6 +1172,137 @@ class SuperAdminController extends Controller
             }
 
     }
+
+    public function deleteBusiness($id)
+    {
+        try {
+            DB::beginTransaction(); // Start the transaction
+
+            // Find the business
+            $business = Business::findOrFail($id);
+
+            // Delete all related data in the correct order to maintain referential integrity
+            
+            // 1. Delete activity logs and tracking data
+            \App\Models\Activity::where('business_id', $business->id)->delete();
+            \App\Models\AttendanceLog::where('business_id', $business->id)->delete();
+            \App\Models\AttendanceBreak::where('business_id', $business->id)->delete();
+            \App\Models\DeviceStatusLog::where('business_id', $business->id)->delete();
+            \App\Models\SOSLog::where('business_id', $business->id)->delete();
+            \App\Models\Visit::where('business_id', $business->id)->delete();
+            
+            // 2. Delete communication and notification data
+            \App\Models\Message::where('business_id', $business->id)->delete();
+            \App\Models\Notification::where('business_id', $business->id)->delete();
+            \App\Models\UserNotification::where('business_id', $business->id)->delete();
+            \App\Models\Chat::where('business_id', $business->id)->delete();
+            \App\Models\ChatMessage::where('business_id', $business->id)->delete();
+            \App\Models\ChatParticipant::where('business_id', $business->id)->delete();
+            \App\Models\ChatFile::where('business_id', $business->id)->delete();
+            \App\Models\ChatMessageReaction::where('business_id', $business->id)->delete();
+            \App\Models\ChatMessageReadReceipt::where('business_id', $business->id)->delete();
+            
+            // 3. Delete HR and organizational data
+            \App\Models\Attendance::where('business_id', $business->id)->delete();
+            \App\Models\CallLog::where('business_id', $business->id)->delete();
+            \App\Models\Department::where('business_id', $business->id)->delete();
+            \App\Models\Designation::where('business_id', $business->id)->delete();
+            \App\Models\Team::where('business_id', $business->id)->delete();
+            \App\Models\Shift::where('business_id', $business->id)->delete();
+            \App\Models\Holiday::where('business_id', $business->id)->delete();
+            \App\Models\LeaveType::where('business_id', $business->id)->delete();
+            \App\Models\LeaveRequest::where('business_id', $business->id)->delete();
+            \App\Models\UserAvailableLeave::where('business_id', $business->id)->delete();
+            \App\Models\LoanRequest::where('business_id', $business->id)->delete();
+            
+            // 4. Delete payroll and financial data
+            \App\Models\PayrollCycle::where('business_id', $business->id)->delete();
+            \App\Models\PayrollRecord::where('business_id', $business->id)->delete();
+            \App\Models\PayrollAdjustment::where('business_id', $business->id)->delete();
+            \App\Models\PayrollAdjustmentLog::where('business_id', $business->id)->delete();
+            \App\Models\Payslip::where('business_id', $business->id)->delete();
+            \App\Models\BankAccount::where('business_id', $business->id)->delete();
+            \App\Models\ExpenseType::where('business_id', $business->id)->delete();
+            \App\Models\ExpenseRequest::where('business_id', $business->id)->delete();
+            \App\Models\ExpenseRequestItem::where('business_id', $business->id)->delete();
+            \App\Models\SalesTarget::where('business_id', $business->id)->delete();
+            \App\Models\SalesTargetLog::where('business_id', $business->id)->delete();
+            \App\Models\PaymentCollection::where('business_id', $business->id)->delete();
+            
+            // 5. Delete document and form data
+            \App\Models\DocumentType::where('business_id', $business->id)->delete();
+            \App\Models\DocumentRequest::where('business_id', $business->id)->delete();
+            \App\Models\Form::where('business_id', $business->id)->delete();
+            \App\Models\FormField::where('business_id', $business->id)->delete();
+            \App\Models\FormAssignment::where('business_id', $business->id)->delete();
+            \App\Models\FormEntry::where('business_id', $business->id)->delete();
+            \App\Models\FormEntryField::where('business_id', $business->id)->delete();
+            
+            // 6. Delete product and inventory data
+            \App\Models\ProductCategory::where('business_id', $business->id)->delete();
+            \App\Models\Product::where('business_id', $business->id)->delete();
+            \App\Models\ProductOrder::where('business_id', $business->id)->delete();
+            \App\Models\OrderLine::where('business_id', $business->id)->delete();
+            \App\Models\Client::where('business_id', $business->id)->delete();
+            
+            // 7. Delete security and verification data
+            \App\Models\IpAddress::where('business_id', $business->id)->delete();
+            \App\Models\IpAddressGroup::where('business_id', $business->id)->delete();
+            \App\Models\IpAddressVerificationLog::where('business_id', $business->id)->delete();
+            \App\Models\GeofenceGroup::where('business_id', $business->id)->delete();
+            \App\Models\GeofenceLocation::where('business_id', $business->id)->delete();
+            \App\Models\GeofenceVerificationLog::where('business_id', $business->id)->delete();
+            \App\Models\QrGroup::where('business_id', $business->id)->delete();
+            \App\Models\QrCodeModel::where('business_id', $business->id)->delete();
+            \App\Models\QrCodeVerificationLog::where('business_id', $business->id)->delete();
+            \App\Models\DynamicQrDevice::where('business_id', $business->id)->delete();
+            \App\Models\DynamicQrVerificationLog::where('business_id', $business->id)->delete();
+            \App\Models\DigitalIdCard::where('business_id', $business->id)->delete();
+            \App\Models\Site::where('business_id', $business->id)->delete();
+            
+            // 8. Delete notification and settings data
+            \App\Models\Notice::where('business_id', $business->id)->delete();
+            \App\Models\TeamNotice::where('business_id', $business->id)->delete();
+            \App\Models\UserNotice::where('business_id', $business->id)->delete();
+            \App\Models\NotificationPreference::where('business_id', $business->id)->delete();
+            \App\Models\UserSettings::where('business_id', $business->id)->delete();
+            \App\Models\UserStatusModel::where('business_id', $business->id)->delete();
+            \App\Models\Settings::where('business_id', $business->id)->delete();
+            
+            // 9. Delete task data
+            \App\Models\Task::where('business_id', $business->id)->delete();
+            \App\Models\TaskUpdate::where('business_id', $business->id)->delete();
+            
+            // 10. Delete role data (after users)
+            \App\Models\Role::where('business_id', $business->id)->delete();
+            
+            // 11. Delete subscriptions
+            \App\Models\Subscription::where('business_id', $business->id)->delete();
+            
+            // 12. Delete user devices and related data (before users)
+            \App\Models\UserDevice::where('business_id', $business->id)->delete();
+            
+            // 13. Delete all users tied to this business
+            \App\Models\User::where('business_id', $business->id)->delete();
+
+            // Finally, delete the business
+            $business->delete();
+
+            DB::commit(); // Commit the transaction if everything is successful
+
+            return redirect()->route('superadmin.businesses')
+                ->with('success', 'Business and all related data deleted successfully');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of failure
+
+            // Log the error for debugging
+            Log::error('Failed to delete business: ' . $e->getMessage());
+
+            return redirect()->route('superadmin.businesses')
+                ->with('error', 'Failed to delete the business. Please try again later.');
+        }
+    }
+
     
     public function showBusiness($id)
     {
@@ -1215,7 +1353,7 @@ class SuperAdminController extends Controller
         return view('superadmin_saas.subscription', compact('subscriptions'));
     }
 
-   // Update subscription status
+    // Update subscription status
     public function updateStatus(Request $request, $id)
     {
         $subscription = Subscription::findOrFail($id);
