@@ -107,10 +107,12 @@
                 @endif
               @endif
 
-              @if($configData['displayQuickCreate'] == true&& auth()->user()->is_superuser)
+              @if($configData['displayQuickCreate'] == true && auth()->user()->is_superuser)
                 @include('layouts.sections.menu.quickCreateMenu')
               @endif
-              @if($configData['displayAddon'] == true)
+              
+              @if(auth()->user()->is_superuser)
+               @if($configData['displayAddon'] == true)
                 <!--Addons -->
                 <li class="nav-item dropdown dropdown-addons me-2 me-xl-0">
                   <a class="nav-link dropdown-toggle hide-arrow" href="{{route('addons.index')}}">
@@ -120,8 +122,6 @@
                   </a>
                 </li>
               @endif
-
-              @if(auth()->user()->is_superuser)
                 <!-- Settings -->
                 <li class="nav-item dropdown dropdown-addons me-2 me-xl-0">
                   <a class="nav-link dropdown-toggle hide-arrow" href="{{route('settings.index')}}">

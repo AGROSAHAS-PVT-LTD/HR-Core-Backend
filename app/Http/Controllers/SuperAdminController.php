@@ -262,9 +262,9 @@ class SuperAdminController extends Controller
     
             // Create a Subscription for the newly created business
             $subscriptionData = [
-                'user_id' => $owner->id, // link the subscription to the owner
-                'package_id' => $package->id, // Package ID from the selected Package
-                'start_date' => now(), // Assuming the subscription starts now
+                'user_id' => $owner->id, 
+                'package_id' => $package->id, 
+                'start_date' => now(), 
                 'end_date' => now()->add($package->interval_count, $package->interval), // Dynamically add subscription duration
                 'business_id' => $business->id, // Link the subscription to the created business
                 // 'payment_transaction_id' => $request->input('transaction_id'), // Transaction ID from the form
@@ -1082,7 +1082,6 @@ class SuperAdminController extends Controller
             return redirect()->route('superadmin.businesses')->with('error', 'An error occurred while adding the subscription.');
         }
     }
-
 
     
     public function addSubscription(Request $request)

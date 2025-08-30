@@ -46,6 +46,8 @@ Route::middleware('api')->group(function () {
     Route::group(['prefix' => 'manager/'], function () {
        Route::post('loginWithEmailAddress', [ManagerApiController::class, 'loginWithEmailAddress'])->name('loginWithEmailAddress');
        Route::get('getUnAuthPackages', [ManagerApiController::class, 'getUnAuthPackages'])->name('manager.unpackages');
+       Route::post('addNewAccountData', [ManagerApiController::class, 'addNewAccountData'])->name('manager.useraccount.edit');
+
     });
    
 
@@ -184,8 +186,6 @@ Route::middleware('auth:api')->group(function () {
 
       // ManagerApiController
       Route::group(['prefix' => 'manager'], function () {
-
-
         Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
         Route::get('getDashboardData', [ManagerApiController::class, 'getDashboard'])->name('manager.dashboard');
         Route::get('getEmployeesStatus', [ManagerApiController::class, 'getEmployeesStatus'])->name('manager.employees.status');
@@ -197,7 +197,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('getUserData', [ManagerApiController::class, 'getUserData'])->name('manager.users.data');
         Route::post('addNewUserData', [ManagerApiController::class, 'addNewUserData'])->name('manager.user.add');
         Route::post('editUserData', [ManagerApiController::class, 'editUserData'])->name('manager.user.edit');
-        Route::post('addNewAccountData', [ManagerApiController::class, 'addNewAccountData'])->name('manager.useraccount.edit');
             
         Route::get('getTaskDetails', [ManagerApiController::class, 'getTaskDetails'])->name('manager.task.data');
 
