@@ -789,6 +789,11 @@ class ManagerApiController extends Controller
 
 
         $leaveRequest->save();
+         return response()->json([
+                'statusCode' => 201,
+                'status' => 'success',
+                'message' => 'Leave request status updated successfully.',
+            ]);
 
         return Success::response('Leave request status updated successfully');
     }
@@ -870,8 +875,12 @@ class ManagerApiController extends Controller
         $expenseRequest->approved_amount = $approvedAmount;
 
         $expenseRequest->save();
-
-        return Success::response('Expense request status updated successfully');
+         return response()->json([
+                'statusCode' => 200,
+                'status' => 'success',
+                'message' => 'Expense request status updated successfully',
+            ]);
+        // return Success::response('Expense request status updated successfully');
     }
     
     public function getTaskDetails()
