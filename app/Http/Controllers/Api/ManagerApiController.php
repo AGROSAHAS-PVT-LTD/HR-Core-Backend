@@ -784,8 +784,9 @@ class ManagerApiController extends Controller
 
         $leaveRequest->status = $status;
         $leaveRequest->approved_at = now();
-        $leaveRequest->approved_by_id = auth()->user()->id;
-        $leaveRequest->approver_remarks = $remarks;
+        $leaveRequest->approved_by_id = auth()->user()->id; 
+        $leaveRequest->notes = $remarks;
+
 
         $leaveRequest->save();
 
@@ -864,7 +865,8 @@ class ManagerApiController extends Controller
         $expenseRequest->status = $status;
         $expenseRequest->approved_at = now();
         $expenseRequest->approved_by_id = auth()->user()->id;
-        $expenseRequest->approver_remarks = $remarks;
+        $expenseRequest->notes = $remarks;
+        // $leaveRequest->approver_remarks = $remarks;
         $expenseRequest->approved_amount = $approvedAmount;
 
         $expenseRequest->save();
