@@ -794,11 +794,11 @@ class ManagerApiController extends Controller
 
     public function getAllExpenseRequests()
     {
-        $totalUserIds = User::where('business_id', auth()->user()->id)
-            ->where('status', 'active')
-            ->select('id');
+        // $totalUserIds = User::where('business_id', auth()->user()->business_id)
+        //     ->where('status', 'active')
+        //     ->select('id');
 
-        $expenseRequests = ExpenseRequest::whereIn('user_id', $totalUserIds)
+        $expenseRequests = ExpenseRequest::where('business_id', auth()->user()->business_id)
             ->with('expenseType')
             ->with('user')
             ->get();

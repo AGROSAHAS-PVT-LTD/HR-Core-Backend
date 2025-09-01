@@ -46,6 +46,8 @@ Route::middleware('api')->group(function () {
     Route::group(['prefix' => 'manager/'], function () {
        Route::post('loginWithEmailAddress', [ManagerApiController::class, 'loginWithEmailAddress'])->name('loginWithEmailAddress');
        Route::get('getUnAuthPackages', [ManagerApiController::class, 'getUnAuthPackages'])->name('manager.unpackages');
+        Route::get('getPackagesData', [ManagerApiController::class, 'getPackages'])->name('manager.packages');
+
        Route::post('addNewAccountData', [ManagerApiController::class, 'addNewAccountData'])->name('manager.useraccount.edit');
 
     });
