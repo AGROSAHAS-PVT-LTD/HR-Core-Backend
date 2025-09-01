@@ -26,6 +26,7 @@ class ExpenseRequest extends Model implements AuditableContract
     'status',
     'approval_notes',
     'notes',
+    'remarks',
     'approved_by_id',
     'rejected_by_id',
     'approved_at',

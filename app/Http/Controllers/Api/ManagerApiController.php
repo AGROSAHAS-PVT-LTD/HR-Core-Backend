@@ -865,7 +865,7 @@ class ManagerApiController extends Controller
         $expenseRequest->status = $status;
         $expenseRequest->approved_at = now();
         $expenseRequest->approved_by_id = auth()->user()->id;
-        $expenseRequest->notes = $remarks;
+        $expenseRequest->remarks = $remarks;
         // $leaveRequest->approver_remarks = $remarks;
         $expenseRequest->approved_amount = $approvedAmount;
 
