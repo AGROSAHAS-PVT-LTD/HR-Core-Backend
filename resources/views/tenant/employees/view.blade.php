@@ -1,7 +1,7 @@
 @php
   use App\Enums\IncentiveType;use App\Enums\UserAccountStatus;use App\Services\AddonService\IAddonService;use Carbon\Carbon;
   use App\Helpers\StaticDataHelpers;
-  $role = $user->roles()->first()->name;
+  $role = optional($user->roles()->first())->name ?? 'N/A';
   $addonService = app(IAddonService::class);
 @endphp
 @extends('layouts.layoutMaster')

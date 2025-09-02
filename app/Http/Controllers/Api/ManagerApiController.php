@@ -299,7 +299,7 @@ class ManagerApiController extends Controller
             $createdUser->save();
     
             // Attach role to the new user
-            // $user->assignRole('field_employee');
+            $createdUser->assignRole('field_employee');
 
     
             $businessId = $createdUser->business_id;
