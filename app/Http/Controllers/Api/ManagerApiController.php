@@ -311,7 +311,7 @@ class ManagerApiController extends Controller
                     'description' => 'This is the default team.',
                     'status' => 'active',
                     'is_chat_enabled' => true,
-                    'code' => 'B0'.$businessId,
+                    'code' => 'T0'.$businessId,
                     'created_by_id' => $createdUser->id,
                     'updated_by_id' => $createdUser->id,
                     'business_id' => $businessId,
@@ -322,7 +322,7 @@ class ManagerApiController extends Controller
             $shift =  Shift::firstOrCreate(
                 ['name' => 'Default Shift', 'business_id' => $businessId],
                 [
-                    'code' => 'B0'.$businessId,
+                    'code' => 'SH0'.$businessId,
                     'description' => 'This is the default shift.',
                     'start_time' => '09:00:00',
                     'end_time' => '17:00:00',
@@ -338,6 +338,8 @@ class ManagerApiController extends Controller
                     'created_by_id' => $createdUser->id,
                     'updated_by_id' => $createdUser->id,
                     'business_id' => $businessId,
+                    'start_date' => now()->toDateString(),
+                    'end_date' => now()->toDateString(),
                 ]
             );
             $createdUser->shift_id = $shift->id;

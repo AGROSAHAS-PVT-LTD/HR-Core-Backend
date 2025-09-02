@@ -2,7 +2,7 @@
   use App\Enums\IncentiveType;use App\Enums\UserAccountStatus;use App\Services\AddonService\IAddonService;use Carbon\Carbon;
   use App\Helpers\StaticDataHelpers;
   $role = $user->roles()->first()->name;
-    $addonService = app(IAddonService::class);
+  $addonService = app(IAddonService::class);
 @endphp
 @extends('layouts.layoutMaster')
 
@@ -140,7 +140,7 @@
             </li>
             <li class="mb-2 d-flex align-items-center">
               <i class="bx bx-id-card text-muted me-2"></i>
-              <strong>Role:</strong> <span class="ms-2">{{ $user->roles()->first()->name ?? 'N/A' }}</span>
+              <strong>Role:</strong> <span class="ms-2">{{ optional($user->roles()->first())->name ?? 'N/A' }}</span>
             </li>
             <li class="mb-2 d-flex align-items-center">
               <i class="bx bx-group text-muted me-2"></i>

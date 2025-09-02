@@ -208,7 +208,9 @@ class TaskSystemApiController extends Controller
 
   public function getManagerTasks()
   {
-    $tasks = Task::with(['client', 'user'])
+
+    $tasks = Task::where('business_id', auth()->user()->business_id)
+      ->with(['client', 'user'])
       ->get();
 
     $result = [];
