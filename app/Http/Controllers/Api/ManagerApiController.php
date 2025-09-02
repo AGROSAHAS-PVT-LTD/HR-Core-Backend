@@ -244,6 +244,31 @@ class ManagerApiController extends Controller
                 'message' => 'Unauthorized access. Please log in.',
             ], 401);
         }
+
+        $subscription = Subscription::where('business_id', $user->business_id)
+            ->orderBy('end_date', 'desc')
+            ->first();
+        
+        if (!$subscription) {
+            return response()->json([
+                'statusCode' => 400,
+                'status' => 'error',
+                'message' => 'Unauthorized access. Please Subscription now to contuine.',
+            ], 400);
+        }
+        $package = $subscription->package;
+        $packageUserCount  = $package->user_count;
+        $allUsersCount = User::where('business_id', $user->business_id)->count();
+
+
+        if ($allUsersCount >= $packageUserCount) {
+            return response()->json([
+                'statusCode' => 403,
+                'status' => 'error',
+                'message' => 'You have reached the maximum number of users allowed for your subscription package.',
+            ], 403);
+        }
+
     
         // Prepare validated data
         $validatedUserData = $validator->validated();
@@ -274,7 +299,7 @@ class ManagerApiController extends Controller
             $createdUser->save();
     
             // Attach role to the new user
-            $user->assignRole('field_employee');
+            // $user->assignRole('field_employee');
 
     
             $businessId = $createdUser->business_id;
