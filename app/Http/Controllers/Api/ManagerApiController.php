@@ -311,6 +311,7 @@ class ManagerApiController extends Controller
                     'description' => 'This is the default team.',
                     'status' => 'active',
                     'is_chat_enabled' => true,
+                    'code' => 'B0'.$businessId,
                     'created_by_id' => $createdUser->id,
                     'updated_by_id' => $createdUser->id,
                     'business_id' => $businessId,
@@ -319,8 +320,9 @@ class ManagerApiController extends Controller
     
             // Create Default Shift if not exists
             $shift =  Shift::firstOrCreate(
-                ['title' => 'Default Shift', 'business_id' => $businessId],
+                ['name' => 'Default Shift', 'business_id' => $businessId],
                 [
+                    'code' => 'B0'.$businessId,
                     'description' => 'This is the default shift.',
                     'start_time' => '09:00:00',
                     'end_time' => '17:00:00',
